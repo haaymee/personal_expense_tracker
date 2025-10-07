@@ -1,3 +1,4 @@
+import 'package:expenses_tracker/pages/LoginPage.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -24,10 +25,6 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Expense Tracker"),
-      ),
-    );
+    return LoginPage();
   }
 }
