@@ -1,3 +1,5 @@
+import 'package:expenses_tracker/models/BudgetEntry.dart';
+import 'package:expenses_tracker/widgets/Cards.dart';
 import 'package:expenses_tracker/widgets/Labels.dart';
 import 'package:flutter/material.dart';
 
@@ -6,6 +8,15 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final budget = BudgetEntry(
+      title: "Bok Chicken", 
+      category: "Food", 
+      date: DateTime.now(), 
+      expense: 480.00,
+      description: "Bok with Tin aklsjdlkasdjlkasdjlaksdjklasdjlassdjkl"
+    );
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -37,13 +48,38 @@ class HomePage extends StatelessWidget {
         ],
       ),
 
+      persistentFooterButtons: [
+        IconButton(onPressed:(){}, icon: Icon(Icons.home))
+      ],
+
+      persistentFooterAlignment: AlignmentDirectional.center,
+
       body: Column(
         children: [
 
           SizedBox(height: 24),
 
           HeadingBalanceContainer(),
-          
+
+          SizedBox(height: 24),
+
+          HorizontalDatedLabel(
+            date: DateTime.now(), 
+            label:  "Daily Expenses: 3,300",
+            dateStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 18
+            )
+          ),
+
+          Divider(
+            height: 21,
+            thickness: 3,
+            color: Color.fromARGB(255, 221, 189, 255),
+          ),
+
+          ExpenseCard(budgetEntry: budget)
+
         ],
       ),
     );
@@ -116,7 +152,6 @@ class HeadingBalanceContainer extends StatelessWidget {
               spacing: 2,
     
             ),
-    
           ],
         ),
       ),
