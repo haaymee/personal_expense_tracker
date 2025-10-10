@@ -19,7 +19,7 @@ class ExpenseCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           spacing: 13,
           children: [
-            Icon(Icons.dining, size: 35),
+            _budgetEntry.icon != null ? _budgetEntry.icon! : Icon(Icons.disabled_by_default),
             
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

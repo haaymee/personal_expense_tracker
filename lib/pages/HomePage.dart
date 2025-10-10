@@ -1,24 +1,44 @@
+
+import 'dart:math';
+
 import 'package:expenses_tracker/models/BudgetEntry.dart';
 import 'package:expenses_tracker/widgets/Cards.dart';
 import 'package:expenses_tracker/widgets/Labels.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
+  final budgets = List<BudgetEntry>.generate(
+    20,
+    (index) => BudgetEntry(
+      title: "Entry $index", 
+      description: "Description #$index",
+      category: "Food", 
+      date: DateTime.now().subtract(Duration(days: 1)), 
+      expense: Random().nextDouble() * 1000,
+      icon: Icon(Icons.dining, size: 50)
+    )
+  );
 
-    final budget = BudgetEntry(
+  final budget = BudgetEntry(
       title: "Bok Chicken", 
       category: "Food", 
       date: DateTime.now(), 
       expense: 480.00,
-      description: "Bok with Tin aklsjdlkasdjlkasdjlaksdjklasdjlassdjkl"
+      description: "Bok with Tin aklsjdlkasdjlkasdjlaksdjklasdjlassdjkl",
+      icon: Icon(Icons.dining)
     );
 
+  @override
+  Widget build(BuildContext context) {
+
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 252, 245, 255),
       appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: const Color.fromARGB(255, 252, 245, 255),
         centerTitle: true,
         title: Text("Home", style: TextStyle(fontWeight: FontWeight.bold)),
         leading: IconButton(
@@ -63,22 +83,53 @@ class HomePage extends StatelessWidget {
 
           SizedBox(height: 24),
 
-          HorizontalDatedLabel(
-            date: DateTime.now(), 
-            label:  "Daily Expenses: 3,300",
-            dateStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: 18
-            )
-          ),
+          
 
-          Divider(
-            height: 21,
-            thickness: 3,
-            color: Color.fromARGB(255, 221, 189, 255),
-          ),
+          Expanded(
+            child: ListView.builder(
+              
+              itemCount: budgets.length,
+              itemBuilder: (context, index) {
 
-          ExpenseCard(budgetEntry: budget)
+                if (index == 0)
+                {
+                  return Column(
+                    children: [
+                      HorizontalDatedLabel(
+                        date: DateTime.now(), 
+                        label:  "Daily Expenses: 3,300",
+                        dateStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18
+                        )
+                      ),
+                      
+                      Divider(
+                        height: 21,
+                        thickness: 3,
+                        color: Color.fromARGB(255, 221, 189, 255),
+                      ),
+                    ],
+                  );
+                }
+
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: ExpenseCard(budgetEntry: budgets[index]),
+                    ),
+                    Divider(
+                      height: 21,
+                      thickness: 1.85,
+                      color: Color.fromARGB(32, 0, 0, 0),
+                    ),
+                  ],
+                );
+              }
+            ),
+          )
+
 
         ],
       ),
