@@ -2,6 +2,7 @@
 import 'dart:math';
 
 import 'package:expenses_tracker/models/BudgetEntry.dart';
+import 'package:expenses_tracker/slivers/delegates.dart';
 import 'package:expenses_tracker/widgets/Cards.dart';
 import 'package:expenses_tracker/widgets/Labels.dart';
 import 'package:flutter/material.dart';
@@ -35,84 +36,69 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 252, 245, 255),
-      appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        backgroundColor: const Color.fromARGB(255, 252, 245, 255),
-        centerTitle: true,
-        title: Text("Home", style: TextStyle(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: Icon(Icons.menu, size: 30, weight: 10, color: Colors.black),
-          onPressed: () {}, 
-        ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            backgroundColor: const Color.fromARGB(255, 252, 245, 255),
+            centerTitle: true,
+            title: Text("Home", style: TextStyle(fontWeight: FontWeight.bold)),
+            leading: IconButton(
+              icon: Icon(Icons.menu, size: 30, weight: 10, color: Colors.black),
+              onPressed: () {},
+            ),
+
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 20),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {}, 
+                      icon: Icon(Icons.search_rounded, size: 30, weight: 10, color: Colors.black)
+                    ),
+                    
+                    IconButton(
+                      onPressed: () {}, 
+                      icon: Icon(Icons.calendar_month, size: 30, weight: 10, color: Colors.black)
+                    ),
+                  ],
+                ),
+              ),
+
+            ],
+          ),
         
-        actions: [
-          
-          Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () {}, 
-                  icon: Icon(Icons.search_rounded, size: 30, weight: 10, color: Colors.black)
-                ),
-                
-                IconButton(
-                  onPressed: () {}, 
-                  icon: Icon(Icons.calendar_month, size: 30, weight: 10, color: Colors.black)
-                ),
-              ],
+          SliverAppBar(
+            pinned: true,
+            elevation: 0,
+            forceElevated: false,
+            toolbarHeight: 101.905,
+            surfaceTintColor: const Color.fromARGB(255, 252, 245, 255),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Column(
+                children: [
+                  SizedBox(height: 24),
+                  HeadingBalanceContainer(),
+                  SizedBox(height: 24),
+                  HorizontalDatedLabel(
+                    date: DateTime.now(), 
+                    label:  "Daily Expenses: 3,300",
+                    dateStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18
+                    )
+                  )
+                ],
+              ),
             ),
           ),
 
-        ],
-      ),
-
-      persistentFooterButtons: [
-        IconButton(onPressed:(){}, icon: Icon(Icons.home))
-      ],
-
-      persistentFooterAlignment: AlignmentDirectional.center,
-
-      body: Column(
-        children: [
-
-          SizedBox(height: 24),
-
-          HeadingBalanceContainer(),
-
-          SizedBox(height: 24),
-
-          
-
-          Expanded(
-            child: ListView.builder(
-              
-              itemCount: budgets.length,
-              itemBuilder: (context, index) {
-
-                if (index == 0)
-                {
-                  return Column(
-                    children: [
-                      HorizontalDatedLabel(
-                        date: DateTime.now(), 
-                        label:  "Daily Expenses: 3,300",
-                        dateStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18
-                        )
-                      ),
-                      
-                      Divider(
-                        height: 21,
-                        thickness: 3,
-                        color: Color.fromARGB(255, 221, 189, 255),
-                      ),
-                    ],
-                  );
-                }
-
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (content, index) {
                 return Column(
                   children: [
                     Padding(
@@ -126,11 +112,11 @@ class HomePage extends StatelessWidget {
                     ),
                   ],
                 );
-              }
-            ),
-          )
-
-
+              },
+          
+              childCount: budgets.length
+            )
+          ),
         ],
       ),
     );
