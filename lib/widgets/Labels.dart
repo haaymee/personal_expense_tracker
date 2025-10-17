@@ -25,6 +25,7 @@ class VerticalCounterLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
@@ -46,7 +47,7 @@ class VerticalCounterLabel extends StatelessWidget {
 class HorizontalDatedLabel extends StatelessWidget {
   HorizontalDatedLabel(
     {
-      super.key, DateTime? date, String label = "", 
+      super.key, DateTime? date, String label = "", this.spacing = 0,
       TextStyle? dateStyle, TextStyle? labelStyle, String? dateFormat = "d MMMM y"
     }
   ):
@@ -62,11 +63,13 @@ class HorizontalDatedLabel extends StatelessWidget {
   final TextStyle? _dateStyle;
   final TextStyle? _labelStyle;
   final String? _dateFormat;
+  final double spacing;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      spacing: spacing,
       children: [
         Text(
           DateFormat(_dateFormat).format(_date!),
