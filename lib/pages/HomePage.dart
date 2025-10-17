@@ -7,6 +7,7 @@ import 'package:expenses_tracker/models/BudgetEntry.dart';
 import 'package:expenses_tracker/slivers/delegates.dart';
 import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:expenses_tracker/widgets/Cards.dart';
+import 'package:expenses_tracker/widgets/Footers.dart';
 import 'package:expenses_tracker/widgets/Labels.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +19,6 @@ class HomePage extends StatelessWidget {
   final Color bgColor = Color.fromRGBO(245, 238, 255, 1);
   final Color netLossColor = Colors.pink;
   final Color netGainColor = Colors.green;
-
 
   final Map<DateTime, List<BudgetEntry>> _budgets = {
     DateTime.now() : 
@@ -154,15 +154,66 @@ class HomePage extends StatelessWidget {
             ),
           ),
           
-          HeadingBalanceContainer(
-            height: 75,
-            dividerHeight: 50,
-            dividerThickness: 1.75,
-          )
-
+          IgnorePointer(
+            child: HeadingBalanceContainer(
+              height: 75,
+              dividerHeight: 50,
+              dividerThickness: 1.75,
+            ),
+          ),
         ],
       ),
 
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: BoxBorder.fromLTRB(
+            top: BorderSide(
+              color: const Color.fromARGB(210, 129, 61, 255),
+              width: 2
+            )
+          )
+        ),
+
+        child: BottomAppBar(
+          elevation: 10,
+          height: 50,
+          color: bgColor,
+
+          child: Row(
+            spacing: 100,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(Icons.home_filled, color: Colors.deepPurple, size: 35),
+                onPressed: () {},
+              ),
+          
+              IconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(Icons.settings, size: 35),
+                onPressed: () {},
+              ),
+            ]
+          ),
+        ),
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: const Color.fromARGB(210, 129, 61, 255),
+            width: 2
+          )
+        ),
+        backgroundColor: const Color.fromARGB(255, 221, 195, 255),
+        onPressed: () {},
+        tooltip: "Add Transaction",
+        child: Icon(Icons.add),
+      ),
     );
   }
 }
