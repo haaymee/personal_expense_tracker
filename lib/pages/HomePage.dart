@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:expenses_tracker/delegates/SliverPersistentHeaderDelegates.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
 import 'package:expenses_tracker/slivers/delegates.dart';
+import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:expenses_tracker/widgets/Cards.dart';
 import 'package:expenses_tracker/widgets/Labels.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,9 @@ class HomePage extends StatelessWidget {
   HomePage({super.key});
 
   final Color bgColor = Color.fromRGBO(245, 238, 255, 1);
+  final Color netLossColor = Colors.pink;
+  final Color netGainColor = Colors.green;
+
 
   final Map<DateTime, List<BudgetEntry>> _budgets = {
     DateTime.now() : 
@@ -25,7 +29,7 @@ class HomePage extends StatelessWidget {
         description: "Description #$index",
         category: "Food", 
         date: DateTime.now(), 
-        expense: Random().nextDouble() * 1000,
+        transaction: Random().nextDouble() * 1000,
         icon: Icon(Icons.dining, size: 50)
       )
     ),
@@ -38,7 +42,7 @@ class HomePage extends StatelessWidget {
         description: "Description #$index",
         category: "Food", 
         date: DateTime.now().subtract(Duration(days: 1)), 
-        expense: Random().nextDouble() * 1000,
+        transaction: Random().nextDouble() * 1000,
         icon: Icon(Icons.dining, size: 50)
       )
     ),
@@ -51,7 +55,7 @@ class HomePage extends StatelessWidget {
         description: "Description #$index",
         category: "Food", 
         date: DateTime.now().subtract(Duration(days: 2)), 
-        expense: Random().nextDouble() * 1000,
+        transaction: Random().nextDouble() * 1000,
         icon: Icon(Icons.dining, size: 50)
       )
     )
@@ -97,46 +101,27 @@ class HomePage extends StatelessWidget {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 75),
+            padding: const EdgeInsets.only(top: 70),
             child: CustomScrollView(
               slivers: [
                 for (final date in _budgets.keys) ...[
                   MultiSliver(
                     pushPinnedChildren: true,
                     children: [
-                      SliverPinnedHeader(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color:  const Color.fromARGB(255, 255, 0, 106)!.withValues(alpha: .8),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4)
-                              ),
-                            ],
-                            borderRadius: BorderRadius.circular(6),
-                            color: Colors.pink[200]
-                          ), 
-            
-                          height: 50,
-                          width: double.infinity,
-                          child: HorizontalDatedLabel(
-                            date: date,
-                            label: 10000.toString(),
-            
-                            spacing: 100,
-                            dateStyle: TextStyle(
-                              color: const Color.fromARGB(255, 255, 255, 255),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18
-                            ),
-                            labelStyle: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18
-                            ),
-                          ),
-                        )
+                      DatedExpensesPinnedHeader(
+                        date: date, 
+                        label: getFormattedCurrencyAmount(100000),
+                        isNetGain: Random().nextBool(),
+                        dateStyle: TextStyle(
+                          color: const Color.fromARGB(255, 0, 0, 0),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15
+                        ),
+                        labelStyle: TextStyle(
+                          color: const Color.fromARGB(255, 0, 0, 0),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15
+                        ),
                       ),
                     
                       SliverList(delegate: SliverChildBuilderDelegate(
@@ -182,6 +167,83 @@ class HomePage extends StatelessWidget {
   }
 }
 
+class DatedExpensesPinnedHeader extends StatelessWidget {
+  DatedExpensesPinnedHeader({
+    super.key,
+    required this.date,
+    required this.label,
+    required this.isNetGain,
+    this.dateStyle,
+    this.labelStyle,
+    this.spacing = 0,
+    this.boxDecoration,
+  })
+  {
+    Color gainColor = const Color.fromARGB(255, 41, 169, 255);
+    Color lossColor = Colors.pink;
+
+    boxDecoration ??= BoxDecoration(
+      borderRadius: BorderRadius.all(Radius.circular(6)),
+      border: BoxBorder.fromLTRB(
+        top: BorderSide(
+          color: isNetGain ? gainColor : lossColor,
+          width: 2
+        ),
+        bottom: BorderSide(
+          color: isNetGain ? gainColor : lossColor,
+          width: 2
+        ),
+        left: BorderSide(
+          color: isNetGain ? gainColor : lossColor,
+          width: 2
+        ),
+        right: BorderSide(
+          color: isNetGain ? gainColor : lossColor,
+          width: 2
+        )
+      ),
+      color: Color.fromRGBO(245, 238, 255, 1),
+      boxShadow: [
+        BoxShadow(
+          color: isNetGain ? gainColor : lossColor,
+          blurRadius: 6,
+          offset: Offset(0, 3)
+        )
+      ]
+    );
+  }
+
+  bool isNetGain = true;
+  final DateTime date;
+  final String label;
+  final TextStyle? dateStyle;
+  final TextStyle? labelStyle;
+
+  final double spacing;
+  BoxDecoration? boxDecoration;
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPinnedHeader(
+      child: Container(
+        decoration: boxDecoration, 
+        height: 50,
+        width: double.infinity,
+        child: HorizontalDatedLabel(
+          date: date,
+          label: label,
+                
+          spacing: 100,
+          dateStyle: dateStyle,
+          labelStyle: labelStyle
+        ),
+      )
+    );
+  }
+}
+
 class HeadingBalanceContainer extends StatelessWidget {
   const HeadingBalanceContainer({
     super.key,
@@ -204,13 +266,13 @@ class HeadingBalanceContainer extends StatelessWidget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color:  const Color.fromARGB(255, 0, 0, 0).withValues(alpha: .1),
-            blurRadius: 5,
-            offset: const Offset(0, 3)
+            color:  const Color.fromARGB(255, 76, 0, 216).withValues(alpha: .6),
+            blurRadius: 2,
+            offset: const Offset(0, 4)
           ),
         ],
-        borderRadius: BorderRadius.circular(6),
-        color: Color.fromARGB(255, 163, 223, 255)
+        borderRadius: BorderRadius.circular(3),
+        color: Color.fromARGB(255, 177, 94, 255)
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -221,7 +283,7 @@ class HeadingBalanceContainer extends StatelessWidget {
               label: "Expenses",
               labelStyle: TextStyle(),
               
-              counterVal: "3,000",
+              counterVal: getFormattedCurrencyAmount(3000),
               counterStyle: TextStyle(
                 fontWeight: FontWeight.bold
               ),
@@ -240,7 +302,7 @@ class HeadingBalanceContainer extends StatelessWidget {
               label: "Income",
               labelStyle: TextStyle(),
               
-              counterVal: "60,000",
+              counterVal: getFormattedCurrencyAmount(60000),
               counterStyle: TextStyle(
                 fontWeight: FontWeight.bold
               ),
@@ -259,7 +321,7 @@ class HeadingBalanceContainer extends StatelessWidget {
               label: "Balance",
               labelStyle: TextStyle(),
               
-              counterVal: "57,000",
+              counterVal: getFormattedCurrencyAmount(57000),
               counterStyle: TextStyle(
                 fontWeight: FontWeight.bold
               ),

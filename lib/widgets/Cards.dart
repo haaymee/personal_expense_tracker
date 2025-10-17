@@ -1,4 +1,5 @@
 import 'package:expenses_tracker/models/BudgetEntry.dart';
+import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:flutter/material.dart';
 
 class ExpenseCard extends StatelessWidget {
@@ -49,7 +50,7 @@ class ExpenseCard extends StatelessWidget {
         ),
 
         Text(
-          _budgetEntry.expense.toStringAsFixed(2),
+          getFormattedCurrencyAmount(_budgetEntry.expense),
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 15,
