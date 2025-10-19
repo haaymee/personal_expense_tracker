@@ -1,5 +1,6 @@
 import 'package:expenses_tracker/pages/HomePage.dart';
 import 'package:expenses_tracker/pages/LoginPage.dart';
+import 'package:expenses_tracker/routes.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,6 +12,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // return MaterialApp.router(
+    //   routerConfig: appRouter,
+    //   title: 'Flutter Demo',
+    //   theme: ThemeData(
+    //     colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    //   ),
+    // );
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(

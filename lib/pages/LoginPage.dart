@@ -1,5 +1,7 @@
+import 'package:expenses_tracker/routes.dart';
 import 'package:expenses_tracker/widgets/TextInputs.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:svg_flutter/svg.dart';
 
 class LoginPage extends StatelessWidget {
@@ -71,7 +73,9 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
 
-              onPressed: () {}, 
+              onPressed: () {
+                context.goNamed('home');
+              }, 
             ),
           ),
 
