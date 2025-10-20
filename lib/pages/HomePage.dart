@@ -1,22 +1,19 @@
-
-import 'dart:ffi';
 import 'dart:math';
 
-import 'package:expenses_tracker/delegates/SliverPersistentHeaderDelegates.dart';
+import 'package:expenses_tracker/colors.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
-import 'package:expenses_tracker/slivers/delegates.dart';
 import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:expenses_tracker/widgets/Cards.dart';
-import 'package:expenses_tracker/widgets/Footers.dart';
 import 'package:expenses_tracker/widgets/Labels.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:sliver_tools/sliver_tools.dart';
+import 'package:svg_flutter/svg_flutter.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
-  final Color bgColor = Color.fromRGBO(245, 238, 255, 1);
   final Color netLossColor = Colors.pink;
   final Color netGainColor = Colors.green;
 
@@ -29,7 +26,7 @@ class HomePage extends StatelessWidget {
         description: "Description #$index",
         category: "Food", 
         date: DateTime.now(), 
-        transaction: Random().nextDouble() * 1000,
+        transaction: 1000 * Random().nextDouble() * (Random().nextBool() ? 1 : -1),
         icon: Icon(Icons.dining, size: 50)
       )
     ),
@@ -42,7 +39,7 @@ class HomePage extends StatelessWidget {
         description: "Description #$index",
         category: "Food", 
         date: DateTime.now().subtract(Duration(days: 1)), 
-        transaction: Random().nextDouble() * 1000,
+        transaction: 1000 * Random().nextDouble() * (Random().nextBool() ? 1 : -1),
         icon: Icon(Icons.dining, size: 50)
       )
     ),
@@ -55,7 +52,7 @@ class HomePage extends StatelessWidget {
         description: "Description #$index",
         category: "Food", 
         date: DateTime.now().subtract(Duration(days: 2)), 
-        transaction: Random().nextDouble() * 1000,
+        transaction: Random().nextDouble() * 1000 * (Random().nextBool() ? 1 : -1),
         icon: Icon(Icons.dining, size: 50)
       )
     )
@@ -65,36 +62,50 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: appBackgroundColor,
       appBar: AppBar(
-        backgroundColor: bgColor,
-        surfaceTintColor: bgColor,
+        backgroundColor: appBackgroundColor,
+        surfaceTintColor: appBackgroundColor,
         elevation: 0,
         centerTitle: true,
-        title: Text("Home", style: TextStyle(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: Icon(Icons.menu, size: 30, weight: 10, color: Colors.black),
-          onPressed: () {},
+        title: Row(
+          spacing: 15,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: SvgPicture.asset(
+                "assets/icons/navigation/chevron-left.svg",
+                width: 35,
+                height: 35,  
+              ),
+
+              onPressed: () {
+
+              },
+            ),
+
+            Text(
+              DateFormat("MMMM").format(DateTime.now()),
+              style: GoogleFonts.lexend(
+                fontSize: 24,
+                fontWeight: FontWeight.bold
+              )
+            ),
+
+            IconButton(
+              icon: SvgPicture.asset(
+                "assets/icons/navigation/chevron-right.svg",
+                width: 35,
+                height: 35,  
+              ),
+
+              onPressed: () {
+                
+              },
+            ),
+          ],
         ),
 
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () {}, 
-                  icon: Icon(Icons.search_rounded, size: 30, weight: 10, color: Colors.black)
-                ),
-                
-                IconButton(
-                  onPressed: () {}, 
-                  icon: Icon(Icons.calendar_month, size: 30, weight: 10, color: Colors.black)
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
 
 
@@ -112,15 +123,15 @@ class HomePage extends StatelessWidget {
                         date: date, 
                         label: getFormattedCurrencyAmount(100000),
                         isNetGain: Random().nextBool(),
-                        dateStyle: TextStyle(
-                          color: const Color.fromARGB(255, 0, 0, 0),
+                        dateStyle: GoogleFonts.lexend(
                           fontWeight: FontWeight.bold,
-                          fontSize: 15
+                          fontSize: 15,
+                          color: fadedBlack
                         ),
-                        labelStyle: TextStyle(
-                          color: const Color.fromARGB(255, 0, 0, 0),
+                        labelStyle: GoogleFonts.lexend(
                           fontWeight: FontWeight.bold,
-                          fontSize: 15
+                          fontSize: 15,
+                          color: fadedBlack
                         ),
                       ),
                     
@@ -161,58 +172,210 @@ class HomePage extends StatelessWidget {
               dividerThickness: 1.75,
             ),
           ),
+
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 50,
+            child: Column(
+              spacing: 15,
+              children: [
+            
+                Align(
+                  alignment: AlignmentGeometry.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 45),
+                    child: Container(
+                      width: 65,
+                      height: 65,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: secondaryColor,
+                        border: BoxBorder.all(color: secondaryColorShadow, width: .5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: secondaryColorShadow,
+                            offset: Offset(2, 4),
+                            blurRadius: 2,
+                          )
+                        ]
+                      ),
+
+                      child: IconButton(
+                        icon: Icon(Icons.add),
+                        color: appBackgroundColor,
+                        onPressed: () {
+
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+            
+                FloatingBottomBar(),
+              ],
+            )
+          )
         ],
       ),
 
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          border: BoxBorder.fromLTRB(
-            top: BorderSide(
-              color: const Color.fromARGB(210, 129, 61, 255),
-              width: 2
-            )
-          )
-        ),
+      // bottomNavigationBar: Container(
+      //   decoration: BoxDecoration(
+      //     border: BoxBorder.fromLTRB(
+      //       top: BorderSide(
+      //         color: const Color.fromARGB(210, 129, 61, 255),
+      //         width: 2
+      //       )
+      //     )
+      //   ),
 
-        child: BottomAppBar(
-          elevation: 10,
-          height: 50,
-          color: bgColor,
+      //   child: BottomAppBar(
+      //     elevation: 10,
+      //     height: 50,
+      //     color: appBackgroundColor,
 
-          child: Row(
-            spacing: 100,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                padding: EdgeInsets.zero,
-                icon: Icon(Icons.home_filled, color: Colors.deepPurple, size: 35),
-                onPressed: () {},
-              ),
+      //     child: Row(
+      //       spacing: 100,
+      //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      //       children: [
+      //         IconButton(
+      //           padding: EdgeInsets.zero,
+      //           icon: Icon(Icons.home_filled, color: Colors.deepPurple, size: 35),
+      //           onPressed: () {},
+      //         ),
           
-              IconButton(
-                padding: EdgeInsets.zero,
-                icon: Icon(Icons.settings, size: 35),
-                onPressed: () {},
-              ),
-            ]
-          ),
-        ),
-      ),
+      //         IconButton(
+      //           padding: EdgeInsets.zero,
+      //           icon: Icon(Icons.settings, size: 35),
+      //           onPressed: () {},
+      //         ),
+      //       ]
+      //     ),
+      //   ),
+      // ),
 
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        elevation: 3,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            color: const Color.fromARGB(210, 129, 61, 255),
-            width: 2
-          )
+      // floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
+      // floatingActionButton: FloatingActionButton(
+      //   elevation: 5,
+      //   shape: CircleBorder(
+      //     side: BorderSide(
+      //       color: secondaryColor,
+      //       width: 2
+      //     )
+      //   ),
+      //   backgroundColor: secondaryColor,
+      //   onPressed: () {},
+      //   tooltip: "Add Transaction",
+      //   child: Icon(Icons.add, color: appBackgroundColor),
+      // ),
+    );
+  }
+}
+
+class FloatingBottomBar extends StatelessWidget {
+  const FloatingBottomBar({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 35.0),
+      child: Container(
+        height: 70,
+        decoration: BoxDecoration(
+          color: appBackgroundColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: secondaryColor,
+            width: 3
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: secondaryColorShadow,
+              offset: Offset(2, 2),
+              blurRadius: 2
+            )
+          ]
         ),
-        backgroundColor: const Color.fromARGB(255, 221, 195, 255),
-        onPressed: () {},
-        tooltip: "Add Transaction",
-        child: Icon(Icons.add),
+                
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: LabeledIcon(
+                iconSrc: "assets/icons/navigation/receipt.svg",
+                label: "Transactions",
+                labelStyle: GoogleFonts.lexend(
+                  color: fadedBlack,
+                  fontSize: 10
+                ),
+                iconWidth: 32,
+                iconHeight: 32,
+                iconColor: fadedBlack,
+              ),
+
+              onPressed: () {
+
+              },
+            ),
+
+            IconButton(
+              icon: LabeledIcon(
+                iconSrc: "assets/icons/navigation/chart.svg",
+                label: "Stats",
+                labelStyle: GoogleFonts.lexend(
+                  color: fadedBlack,
+                  fontSize: 10
+                ),
+                iconWidth: 32,
+                iconHeight: 32,
+                iconColor: fadedBlack,
+              ),
+
+              onPressed: () {
+
+              },
+            ),
+
+            IconButton(
+              icon: LabeledIcon(
+                iconSrc: "assets/icons/navigation/account.svg",
+                label: "Accounts",
+                labelStyle: GoogleFonts.lexend(
+                  color: fadedBlack,
+                  fontSize: 10
+                ),
+                iconWidth: 32,
+                iconHeight: 32,
+                iconColor: fadedBlack,
+              ),
+
+              onPressed: () {
+                
+              },
+            ),
+
+            IconButton(
+              icon: LabeledIcon(
+                iconSrc: "assets/icons/navigation/settings.svg",
+                label: "Settings",
+                labelStyle: GoogleFonts.lexend(
+                  color: fadedBlack,
+                  fontSize: 10
+                ),
+                iconWidth: 32,
+                iconHeight: 32,
+                iconColor: fadedBlack,
+              ),
+
+              onPressed: () {
+                
+              },
+            )
+          ],
+        ),
+                
       ),
     );
   }
@@ -230,33 +393,31 @@ class DatedExpensesPinnedHeader extends StatelessWidget {
     this.boxDecoration,
   })
   {
-    Color gainColor = const Color.fromARGB(255, 41, 169, 255);
-    Color lossColor = Colors.pink;
 
     boxDecoration ??= BoxDecoration(
       borderRadius: BorderRadius.all(Radius.circular(6)),
       border: BoxBorder.fromLTRB(
         top: BorderSide(
-          color: isNetGain ? gainColor : lossColor,
+          color: isNetGain ? netGainColor : netLossColor,
           width: 2
         ),
         bottom: BorderSide(
-          color: isNetGain ? gainColor : lossColor,
+          color: isNetGain ? netGainColor : netLossColor,
           width: 2
         ),
         left: BorderSide(
-          color: isNetGain ? gainColor : lossColor,
+          color: isNetGain ? netGainColor : netLossColor,
           width: 2
         ),
         right: BorderSide(
-          color: isNetGain ? gainColor : lossColor,
+          color: isNetGain ? netGainColor :  netLossColor,
           width: 2
         )
       ),
-      color: Color.fromRGBO(245, 238, 255, 1),
+      color: appBackgroundColor,
       boxShadow: [
         BoxShadow(
-          color: isNetGain ? gainColor : lossColor,
+          color: isNetGain ? netGainColor : netLossColor,
           blurRadius: 6,
           offset: Offset(0, 3)
         )
@@ -311,19 +472,20 @@ class HeadingBalanceContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color:  const Color.fromARGB(255, 76, 0, 216).withValues(alpha: .6),
-            blurRadius: 2,
-            offset: const Offset(0, 4)
+            color:  Colors.black.withValues(alpha: .4),
+            blurRadius: 4,
+            offset: const Offset(2, 2)
           ),
         ],
         borderRadius: BorderRadius.circular(3),
-        color: Color.fromARGB(255, 177, 94, 255)
+        color: primaryColor
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -332,30 +494,35 @@ class HeadingBalanceContainer extends StatelessWidget {
           children: [
             VerticalCounterLabel(
               label: "Expenses",
-              labelStyle: TextStyle(),
+              labelStyle: GoogleFonts.lexend(
+                fontWeight: FontWeight.bold,
+                color: appBackgroundColor
+              ),
               
               counterVal: getFormattedCurrencyAmount(3000),
-              counterStyle: TextStyle(
-                fontWeight: FontWeight.bold
+              counterStyle: GoogleFonts.lexend(
+                color: appBackgroundColor
               ),
-    
               spacing: 2,
     
             ),
     
             Container(
-              color: Colors.black.withValues(alpha: 1),
+              color: appBackgroundColor,
               width: dividerThickness,
               height: dividerHeight,
             ),
             
             VerticalCounterLabel(
               label: "Income",
-              labelStyle: TextStyle(),
-              
+              labelStyle: GoogleFonts.lexend(
+                fontWeight: FontWeight.bold,
+                color: appBackgroundColor
+              ),
+
               counterVal: getFormattedCurrencyAmount(60000),
-              counterStyle: TextStyle(
-                fontWeight: FontWeight.bold
+              counterStyle: GoogleFonts.lexend(
+                color: appBackgroundColor
               ),
     
               spacing: 2,
@@ -363,20 +530,24 @@ class HeadingBalanceContainer extends StatelessWidget {
             ),
     
             Container(
-              color: Colors.black.withValues(alpha: 1),
+              color: appBackgroundColor,
               width: dividerThickness,
               height: dividerHeight,
             ),
 
             VerticalCounterLabel(
               label: "Balance",
-              labelStyle: TextStyle(),
-              
-              counterVal: getFormattedCurrencyAmount(57000),
-              counterStyle: TextStyle(
-                fontWeight: FontWeight.bold
+              labelStyle: GoogleFonts.lexend(
+                fontWeight: FontWeight.bold,
+                color: appBackgroundColor
               ),
-    
+              
+
+              counterVal: getFormattedCurrencyAmount(57000),
+              counterStyle: GoogleFonts.lexend(
+                color: appBackgroundColor
+              ),
+
               spacing: 2,
     
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:svg_flutter/svg.dart';
 
 class VerticalCounterLabel extends StatelessWidget {
   VerticalCounterLabel(
@@ -79,6 +80,47 @@ class HorizontalDatedLabel extends StatelessWidget {
         Text(
           _label,
           style: _labelStyle
+        )
+      ],
+    );
+  }
+}
+
+class LabeledIcon extends StatelessWidget {
+  const LabeledIcon({
+    super.key,
+    required this.iconSrc,
+    required this.label,
+    this.iconWidth = 12,
+    this.iconHeight = 12,
+    this.iconColor = Colors.black,
+    this.labelStyle
+  });
+
+  final String iconSrc;
+  final String label;
+
+  final Color iconColor;
+  final double iconWidth;
+  final double iconHeight;
+  final TextStyle? labelStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        SvgPicture.asset(
+          iconSrc,
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+          width: iconWidth,
+          height: iconHeight,
+          
+        ),
+    
+        Text(
+          label,
+          style: labelStyle
         )
       ],
     );

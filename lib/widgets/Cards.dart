@@ -1,6 +1,8 @@
+import 'package:expenses_tracker/colors.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
 import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ExpenseCard extends StatelessWidget {
   const ExpenseCard(
@@ -27,10 +29,11 @@ class ExpenseCard extends StatelessWidget {
               children: [
                 Text(
                   _budgetEntry.title,
-                  style: TextStyle(
+                  style: GoogleFonts.lexend(
                     fontWeight: FontWeight.bold,
-                    fontSize: 18
-                  )
+                    fontSize: 18,
+                    color: fadedBlack
+                  ),
                 ),
 
 
@@ -39,9 +42,10 @@ class ExpenseCard extends StatelessWidget {
                   child: Text(
                     _budgetEntry.description,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 133, 133, 133)
-                    )
+                    style: GoogleFonts.lexend(
+                      color: Color.fromARGB(255, 133, 133, 133),
+                      fontWeight: FontWeight.lerp(FontWeight.w300, FontWeight.w400, .35)
+                    ), 
                   ),
                 ),
               ],
@@ -50,9 +54,10 @@ class ExpenseCard extends StatelessWidget {
         ),
 
         Text(
-          getFormattedCurrencyAmount(_budgetEntry.expense),
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+          getFormattedCurrencyAmount(_budgetEntry.transaction),
+          style: GoogleFonts.lexend(
+            fontWeight: FontWeight.w300,
+            color: _budgetEntry.transaction > 0 ? netGainColorAlternative : netLossColor,
             fontSize: 15,
           ),
         )
