@@ -1,9 +1,12 @@
 import 'dart:math';
+import 'dart:ui';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:expenses_tracker/colors.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
 import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:expenses_tracker/widgets/Cards.dart';
+import 'package:expenses_tracker/widgets/Inputs.dart';
 import 'package:expenses_tracker/widgets/Labels.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -205,6 +208,8 @@ class HomePage extends StatelessWidget {
                         icon: Icon(Icons.add),
                         color: appBackgroundColor,
                         onPressed: () {
+                          
+                          showBlurredFormDialog(context);
 
                         },
                       ),
@@ -216,66 +221,24 @@ class HomePage extends StatelessWidget {
               ],
             )
           )
+
+
         ],
       ),
 
-      // bottomNavigationBar: Container(
-      //   decoration: BoxDecoration(
-      //     border: BoxBorder.fromLTRB(
-      //       top: BorderSide(
-      //         color: const Color.fromARGB(210, 129, 61, 255),
-      //         width: 2
-      //       )
-      //     )
-      //   ),
-
-      //   child: BottomAppBar(
-      //     elevation: 10,
-      //     height: 50,
-      //     color: appBackgroundColor,
-
-      //     child: Row(
-      //       spacing: 100,
-      //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      //       children: [
-      //         IconButton(
-      //           padding: EdgeInsets.zero,
-      //           icon: Icon(Icons.home_filled, color: Colors.deepPurple, size: 35),
-      //           onPressed: () {},
-      //         ),
-          
-      //         IconButton(
-      //           padding: EdgeInsets.zero,
-      //           icon: Icon(Icons.settings, size: 35),
-      //           onPressed: () {},
-      //         ),
-      //       ]
-      //     ),
-      //   ),
-      // ),
-
-      // floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-      // floatingActionButton: FloatingActionButton(
-      //   elevation: 5,
-      //   shape: CircleBorder(
-      //     side: BorderSide(
-      //       color: secondaryColor,
-      //       width: 2
-      //     )
-      //   ),
-      //   backgroundColor: secondaryColor,
-      //   onPressed: () {},
-      //   tooltip: "Add Transaction",
-      //   child: Icon(Icons.add, color: appBackgroundColor),
-      // ),
     );
   }
 }
 
 class FloatingBottomBar extends StatelessWidget {
-  const FloatingBottomBar({
+  FloatingBottomBar({
     super.key,
   });
+
+  final TextStyle labelStyle = GoogleFonts.lexend(
+    color: fadedBlack,
+    fontSize:10
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -306,10 +269,7 @@ class FloatingBottomBar extends StatelessWidget {
               icon: LabeledIcon(
                 iconSrc: "assets/icons/navigation/receipt.svg",
                 label: "Transactions",
-                labelStyle: GoogleFonts.lexend(
-                  color: fadedBlack,
-                  fontSize: 10
-                ),
+                labelStyle: labelStyle,
                 iconWidth: 32,
                 iconHeight: 32,
                 iconColor: fadedBlack,
@@ -324,10 +284,7 @@ class FloatingBottomBar extends StatelessWidget {
               icon: LabeledIcon(
                 iconSrc: "assets/icons/navigation/chart.svg",
                 label: "Stats",
-                labelStyle: GoogleFonts.lexend(
-                  color: fadedBlack,
-                  fontSize: 10
-                ),
+                labelStyle: labelStyle,
                 iconWidth: 32,
                 iconHeight: 32,
                 iconColor: fadedBlack,
@@ -342,10 +299,7 @@ class FloatingBottomBar extends StatelessWidget {
               icon: LabeledIcon(
                 iconSrc: "assets/icons/navigation/account.svg",
                 label: "Accounts",
-                labelStyle: GoogleFonts.lexend(
-                  color: fadedBlack,
-                  fontSize: 10
-                ),
+                labelStyle:labelStyle,
                 iconWidth: 32,
                 iconHeight: 32,
                 iconColor: fadedBlack,
@@ -360,10 +314,7 @@ class FloatingBottomBar extends StatelessWidget {
               icon: LabeledIcon(
                 iconSrc: "assets/icons/navigation/settings.svg",
                 label: "Settings",
-                labelStyle: GoogleFonts.lexend(
-                  color: fadedBlack,
-                  fontSize: 10
-                ),
+                labelStyle: labelStyle,
                 iconWidth: 32,
                 iconHeight: 32,
                 iconColor: fadedBlack,
@@ -556,4 +507,117 @@ class HeadingBalanceContainer extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> showBlurredFormDialog(BuildContext context) async {
+  
+  TextStyle inputLabelHeaderStyle = GoogleFonts.lexend(
+    color: fadedBlack,
+    fontWeight: FontWeight.bold,
+    fontSize: 16
+  );
+
+  await showGeneralDialog(
+    context: context,
+    barrierLabel: "Form",
+    barrierDismissible: true,
+    barrierColor: Colors.black.withValues(alpha: .3), // dark overlay
+    transitionDuration: const Duration(milliseconds: 250),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+        child: Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  border: BoxBorder.all(color: primaryColor, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryColorShadow,
+                      offset: Offset(2, 2),
+                      blurRadius: 4,
+                      spreadRadius: 1
+                    )
+                  ]
+                ),
+                
+                child: Column(
+                  spacing: 20,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    
+                    Center(
+                      child: Text(
+                        "Add Transaction",
+                        style: GoogleFonts.lexend(
+                          color: fadedBlack,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
+                      ),
+                    ),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 10,
+                      children: [
+                        Text(
+                          "Transaction Type:",
+                          style: inputLabelHeaderStyle,
+                        ),
+
+                        Expanded(
+                          child: TransactionTypeDropdownButton(
+                            
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 10,
+                      children: [
+                        Text(
+                          "Date:",
+                          style: inputLabelHeaderStyle,
+                        ),
+
+                        Flexible(
+                          child: DateTimePickerButton(
+                          )
+                        ),
+                      ],
+                    )
+                    
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      // Fade + Slide animation
+      final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+      return FadeTransition(
+        opacity: curved,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.05), // slight upward slide
+            end: Offset.zero,
+          ).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
 }
