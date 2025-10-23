@@ -579,6 +579,66 @@ Future<void> showBlurredFormDialog(BuildContext context) async {
                         
                         Flexible(child: TransactionAmountInputButton()),
                       ],
+                    ),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 10,
+                      children: [
+                          Text(
+                          "Category:",
+                          style: inputLabelHeaderStyle,
+                        ),
+                        
+                        Flexible(
+                          child: GenericDropdownButton(
+                            dropdownValues: [
+                              "Food",
+                              "Transporation",
+                              "Social",
+                              "Household"
+                            ],
+                          )
+                        ),
+                      ],
+                    ),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 10,
+                      children: [
+                          Text(
+                          "Account:",
+                          style: inputLabelHeaderStyle,
+                        ),
+                        
+                        Flexible(
+                          child: GenericDropdownButton(
+                            borderColor: primaryColor,
+                            dropdownValues: [
+                              "Cash",
+                              "GoTyme Savings",
+                              "Unionbank Savings",
+                              "GCash"
+                            ],
+                          )
+                        ),
+                      ],
+                    ),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 10,
+                      children: [
+                          Text(
+                          "Title:",
+                          style: inputLabelHeaderStyle,
+                        ),
+                        
+                        Flexible(
+                          child: DebouncedAutocomplete()
+                        ),
+                      ],
                     )
                   ],
                 ),

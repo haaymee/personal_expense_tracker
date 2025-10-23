@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:expenses_tracker/colors.dart';
 import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:flutter/material.dart';
@@ -311,6 +313,227 @@ class _TransactionAmountInputButtonState extends State<TransactionAmountInputBut
           )
         ),
       ),
+    );
+  }
+}
+
+class GenericDropdownButton extends StatelessWidget {
+  GenericDropdownButton({
+    super.key,
+    this.itemTextStyle,
+    this.activeIcon,
+    this.idleIcon,
+    this.onSelectedCallback,
+    this.borderColor,
+    required this.dropdownValues,
+  });
+
+  final TextStyle? itemTextStyle;
+  final SvgPicture? activeIcon;
+  final SvgPicture? idleIcon;
+  Color? borderColor;
+
+  List<String> dropdownValues;  
+
+  Function(String?)? onSelectedCallback;
+  
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            offset: Offset(2,2),
+            color: borderColor ?? fadedBlack,
+            blurRadius: 4
+          )
+        ]
+      ),
+
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return DropdownMenu<String>(
+            width: double.infinity,
+            initialSelection: dropdownValues[0],
+            inputDecorationTheme: InputDecorationTheme(
+              filled: true,
+              fillColor: appBackgroundColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: borderColor ?? fadedBlack, width: 2)),
+              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: borderColor ?? fadedBlack, width: 2)),
+          
+            ),
+            textStyle: itemTextStyle ?? GoogleFonts.lexend(color: fadedBlack, fontWeight: FontWeight.w300),
+            menuStyle: MenuStyle(
+              backgroundColor: WidgetStatePropertyAll(appBackgroundColor),
+              elevation: WidgetStatePropertyAll(6),
+              maximumSize: WidgetStatePropertyAll(Size.fromWidth(constraints.maxWidth)),
+              shadowColor: WidgetStatePropertyAll(const Color.fromARGB(164, 0, 0, 0)),
+              shape: WidgetStatePropertyAll(
+                RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(4)),
+              ),
+            ),
+          
+            trailingIcon: idleIcon ?? SvgPicture.asset("assets/icons/navigation/chevron-down.svg"),
+            selectedTrailingIcon: activeIcon ?? SvgPicture.asset("assets/icons/navigation/chevron-up.svg"),
+          
+            dropdownMenuEntries:  [
+
+              for (final entry in dropdownValues) ...[
+                DropdownMenuEntry(
+                  value: entry, 
+                  label: entry, 
+                  style: ButtonStyle(
+                    textStyle: WidgetStatePropertyAll(
+                      itemTextStyle ?? GoogleFonts.lexend(color: fadedBlack, fontWeight: FontWeight.w300)
+                    )
+                  )
+                ),
+              ]
+            ],
+            onSelected: onSelectedCallback ?? (selected) {}
+          );
+        }
+      ),
+    );
+  }
+}
+
+class DebouncedAutocomplete extends StatefulWidget {
+  DebouncedAutocomplete({
+    super.key,
+    this.inputBoxDeco,
+    this.listBoxDeco,
+    this.labelTextStyle,
+  });
+
+  BoxDecoration? inputBoxDeco;
+  BoxDecoration? listBoxDeco;
+
+  TextStyle? labelTextStyle;
+
+  @override
+  State<DebouncedAutocomplete> createState() => _DebouncedAutocompleteState();
+}
+
+class _DebouncedAutocompleteState extends State<DebouncedAutocomplete> {
+  final List<String> allTitles = [
+    'Groceries',
+    'Electric Bill',
+    'Internet',
+    'Rent',
+    'Coffee',
+    'Transportation',
+    'Gas',
+    'Insurance',
+    'Gym',
+    'Subscriptions',
+    'Movies',
+    'Dining Out',
+    'Clothes',
+    'Gadgets',
+  ];
+
+  Timer? _debounce;
+  final ValueNotifier<List<String>> _filtered = ValueNotifier([]);
+
+  void _debounceFilter(String query) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 0), () {
+      final filtered = allTitles
+          .where((title) => title.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+      _filtered.value = filtered;
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _filtered.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        final query = textEditingValue.text.trim();
+
+        // Trigger debounced filtering
+        _debounceFilter(query);
+
+        // Return the latest computed results (via ValueNotifier)
+        return _filtered.value;
+      },
+      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+        return Container(
+          decoration: widget.inputBoxDeco ?? BoxDecoration(
+            border: BoxBorder.fromLTRB(
+              bottom: BorderSide(
+              color: fadedBlack,
+              width: 2
+            )
+        )
+          ),
+          child: TextFormField(
+            controller: controller,
+            focusNode: focusNode,
+            decoration: InputDecoration(
+              isDense: true,
+              hintText: "Enter Title",
+              hintStyle: widget.labelTextStyle ?? GoogleFonts.lexend(color: fadedBlack.withValues(alpha: .4)),
+              border: InputBorder.none,
+            ),
+            style: widget.labelTextStyle ?? GoogleFonts.lexend(color: fadedBlack, fontWeight: FontWeight.w300),
+          ),
+        );
+      },
+      optionsViewBuilder: (context, onSelected, options) {
+        final optList = options.toList();
+
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: 250),
+          child: Container(
+            decoration: widget.inputBoxDeco ?? BoxDecoration(
+              color: const Color.fromARGB(255, 243, 243, 243),
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: .4),
+                  offset: Offset(2, 2),
+                  blurRadius: 8
+                )
+              ]
+            ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: optList.length,
+              itemBuilder: (context, index) {
+                final title = optList[index];
+                return ListTile(
+                  title: Text(
+                    title,
+                    style: widget.labelTextStyle ?? GoogleFonts.lexend(
+                      color: fadedBlack,
+                      fontWeight: FontWeight.w300
+                    ),
+                  ),
+                  onTap: () => onSelected(title),
+                );
+              },
+            ),
+          ),
+        );
+      },
+      
+      onSelected: (value) {
+        debugPrint('Selected: $value');
+      },
     );
   }
 }
