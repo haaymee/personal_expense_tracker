@@ -19,18 +19,18 @@ class TransactionModel {
     this.icon,
   }) : id = id ?? const Uuid().v4();
 
-  final String id;
-  final String title;
-  final String category;
-  final TransactionType transType;
-  final String account;
-  final String fromAccount;
-  final String toAccount;
-  final double transactionAmount;
-  final double transferFees;
-  final DateTime transactionDate;
-  final String description;
-  final Icon? icon;
+  String id;
+  String title;
+  String category;
+  TransactionType transType;
+  String account;
+  String fromAccount;
+  String toAccount;
+  double transactionAmount;
+  double transferFees;
+  DateTime transactionDate;
+  String description;
+  Icon? icon;
 
   TransactionModel copyWith({
     String? id,

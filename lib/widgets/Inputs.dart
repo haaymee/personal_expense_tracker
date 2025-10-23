@@ -62,10 +62,17 @@ class ElevatedTextInput extends StatelessWidget {
 class DateTimePickerButton extends StatefulWidget {
   DateTimePickerButton({
     super.key,
+    required this.dateTimeToShow,
+    required this.updateDateCallback,
+    required this.updateTimeCallback,
     this.inputBoxDeco,
     this.timeTextStyle,
     this.dateTextStyle,
   });
+
+  DateTime dateTimeToShow;
+  Function(DateTime) updateDateCallback;
+  Function(TimeOfDay) updateTimeCallback;
 
   BoxDecoration? inputBoxDeco;
   TextStyle? dateTextStyle;
@@ -77,8 +84,6 @@ class DateTimePickerButton extends StatefulWidget {
 
 class _DateTimePickerButtonState extends State<DateTimePickerButton> {
   
-  DateTime? _selectedDateTime = DateTime.now();
-
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? date = await showDatePicker(
       context: context,
@@ -89,18 +94,7 @@ class _DateTimePickerButtonState extends State<DateTimePickerButton> {
 
     if (date == null) return;
 
-    setState(() {
-      _selectedDateTime = DateTime(
-        date.year,
-        date.month,
-        date.day,
-        _selectedDateTime!.hour,
-        _selectedDateTime!.minute,
-        _selectedDateTime!.second,
-        _selectedDateTime!.millisecond,
-        _selectedDateTime!.microsecond,
-      );
-    });
+    widget.updateDateCallback(date);
   }
 
   Future<void> _pickTime(BuildContext context) async {
@@ -111,15 +105,7 @@ class _DateTimePickerButtonState extends State<DateTimePickerButton> {
 
     if (time == null) return;
 
-    setState(() {
-      _selectedDateTime = DateTime(
-        _selectedDateTime!.year,
-        _selectedDateTime!.month,
-        _selectedDateTime!.day,
-        time.hour,
-        time.minute,
-      );
-    });
+    widget.updateTimeCallback(time);
   }
 
   @override
@@ -139,7 +125,7 @@ class _DateTimePickerButtonState extends State<DateTimePickerButton> {
         children: [
           GestureDetector(
             child: Text(
-              DateFormat("dd/MM/yy (E)").format(_selectedDateTime!),
+              DateFormat("dd/MM/yy (E)").format(widget.dateTimeToShow),
               style: widget.dateTextStyle ?? GoogleFonts.lexend(
                 color: fadedBlack,
                 fontWeight: FontWeight.w300,
@@ -153,7 +139,7 @@ class _DateTimePickerButtonState extends State<DateTimePickerButton> {
     
           GestureDetector(
             child: Text(
-              DateFormat("jm").format(_selectedDateTime!),
+              DateFormat("jm").format(widget.dateTimeToShow),
               style: widget.dateTextStyle ?? GoogleFonts.lexend(
                 color: fadedBlack,
                 fontWeight: FontWeight.w300,

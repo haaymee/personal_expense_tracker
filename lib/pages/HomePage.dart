@@ -29,7 +29,8 @@ class HomePage extends StatelessWidget {
         category: "Food", 
         transactionDate: DateTime.now(), 
         transactionAmount: 1000 * Random().nextDouble() * (Random().nextBool() ? 1 : -1),
-        icon: Icon(Icons.dining, size: 50)
+        icon: Icon(Icons.dining, size: 50),
+        transType: TransactionType.expense
       )
     ),
 
@@ -42,7 +43,8 @@ class HomePage extends StatelessWidget {
         category: "Food", 
         transactionDate: DateTime.now().subtract(Duration(days: 1)), 
         transactionAmount: 1000 * Random().nextDouble() * (Random().nextBool() ? 1 : -1),
-        icon: Icon(Icons.dining, size: 50)
+        icon: Icon(Icons.dining, size: 50),
+        transType: TransactionType.expense        
       )
     ),
 
@@ -55,7 +57,9 @@ class HomePage extends StatelessWidget {
         category: "Food", 
         transactionDate: DateTime.now().subtract(Duration(days: 2)), 
         transactionAmount: Random().nextDouble() * 1000 * (Random().nextBool() ? 1 : -1),
-        icon: Icon(Icons.dining, size: 50)
+        icon: Icon(Icons.dining, size: 50),
+        transType: TransactionType.expense
+
       )
     )
   };
@@ -576,6 +580,37 @@ class _TransactionWindowState extends State<TransactionWindow> {
     transType: TransactionType.income
   );
 
+  void updateTransactionType(String? newTransType)
+  {
+    if (newTransType != null)
+    {
+      setState(() {
+        _transactionToAdd.transType = TransactionType.values.byName(newTransType.toLowerCase());
+      }); 
+    }    
+  }
+
+  void updateTransactionDate(DateTime newDate)
+  {
+    setState(() {
+      _transactionToAdd.transactionDate = _transactionToAdd.transactionDate.copyWith(
+        year: newDate.year,
+        month: newDate.month,
+        day: newDate.day
+      );
+    }); 
+  }
+
+  void updateTransactionTime(TimeOfDay newDateTimeOfDay)
+  {
+    setState(() {
+      _transactionToAdd.transactionDate = _transactionToAdd.transactionDate.copyWith(
+        hour: newDateTimeOfDay.hour,
+        minute: newDateTimeOfDay.minute
+      );
+    });     
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -611,9 +646,18 @@ class _TransactionWindowState extends State<TransactionWindow> {
             ),
           ),
     
-          TransactionTypeInput(inputLabelHeaderStyle: widget.inputLabelHeaderStyle),
+          TransactionTypeInput(
+            inputLabelHeaderStyle: widget.inputLabelHeaderStyle,
+            transactionType: _transactionToAdd.transType,
+            updateTransactionModelCallback: updateTransactionType,
+          ),
     
-          DateInput(inputLabelHeaderStyle: widget.inputLabelHeaderStyle),
+          DateInput(
+            inputLabelHeaderStyle: widget.inputLabelHeaderStyle,
+            dateTimeToShow: _transactionToAdd.transactionDate,
+            updateDateCallback: ,
+            updateTimeCallback: ,
+          ),
     
           AmountInput(widget: widget),
     
@@ -891,10 +935,18 @@ class AmountInput extends StatelessWidget {
 }
 
 class DateInput extends StatelessWidget {
-  const DateInput({
+  DateInput({
     super.key,
     required this.inputLabelHeaderStyle,
+    required this.dateTimeToShow,
+    required this.updateDateCallback,
+    required this.updateTimeCallback,
   });
+
+  DateTime dateTimeToShow;
+  Function(DateTime) updateDateCallback;
+  Function(TimeOfDay) updateTimeCallback;
+
 
   final TextStyle inputLabelHeaderStyle;
 
@@ -911,6 +963,9 @@ class DateInput extends StatelessWidget {
     
         Flexible(
           child: DateTimePickerButton(
+            dateTimeToShow: dateTimeToShow,
+            updateDateCallback: updateDateCallback,
+            updateTimeCallback: updateTimeCallback,
           )
         ),
       ],
@@ -922,9 +977,13 @@ class TransactionTypeInput extends StatelessWidget {
   const TransactionTypeInput({
     super.key,
     required this.inputLabelHeaderStyle,
+    required this.transactionType,
+    required this.updateTransactionModelCallback
   });
 
   final TextStyle inputLabelHeaderStyle;
+  final TransactionType transactionType;
+  final Function(String?) updateTransactionModelCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -938,7 +997,21 @@ class TransactionTypeInput extends StatelessWidget {
         ),
     
         Expanded(
-          child: TransactionTypeDropdownButton(),
+          child: GenericDropdownButton(
+            borderColor: switch (transactionType) {
+
+              TransactionType.income => netGainColor,
+              TransactionType.expense => netLossColor,
+              TransactionType.transfer => secondaryColor,
+
+            },
+            dropdownValues: [
+              "Income",
+              "Expense",
+              "Transfer"
+            ],
+            onSelectedCallback: updateTransactionModelCallback,
+          ),
         ),
       ],
     );
