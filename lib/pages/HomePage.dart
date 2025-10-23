@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:expenses_tracker/colors.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
 import 'package:expenses_tracker/utils/StringUtils.dart';
@@ -20,42 +19,42 @@ class HomePage extends StatelessWidget {
   final Color netLossColor = Colors.pink;
   final Color netGainColor = Colors.green;
 
-  final Map<DateTime, List<BudgetEntry>> _budgets = {
+  final Map<DateTime, List<TransactionModel>> _budgets = {
     DateTime.now() : 
-    List<BudgetEntry>.generate(
+    List<TransactionModel>.generate(
       10,
-      (index) => BudgetEntry(
+      (index) => TransactionModel(
         title: "Entry $index", 
         description: "Description #$index",
         category: "Food", 
-        date: DateTime.now(), 
-        transaction: 1000 * Random().nextDouble() * (Random().nextBool() ? 1 : -1),
+        transactionDate: DateTime.now(), 
+        transactionAmount: 1000 * Random().nextDouble() * (Random().nextBool() ? 1 : -1),
         icon: Icon(Icons.dining, size: 50)
       )
     ),
 
     DateTime.now().subtract(Duration(days: 1)) : 
-    List<BudgetEntry>.generate(
+    List<TransactionModel>.generate(
       10,
-      (index) => BudgetEntry(
+      (index) => TransactionModel(
         title: "Entry $index", 
         description: "Description #$index",
         category: "Food", 
-        date: DateTime.now().subtract(Duration(days: 1)), 
-        transaction: 1000 * Random().nextDouble() * (Random().nextBool() ? 1 : -1),
+        transactionDate: DateTime.now().subtract(Duration(days: 1)), 
+        transactionAmount: 1000 * Random().nextDouble() * (Random().nextBool() ? 1 : -1),
         icon: Icon(Icons.dining, size: 50)
       )
     ),
 
     DateTime.now().subtract(Duration(days: 2)) : 
-    List<BudgetEntry>.generate(
+    List<TransactionModel>.generate(
       10,
-      (index) => BudgetEntry(
+      (index) => TransactionModel(
         title: "Entry $index", 
         description: "Description #$index",
         category: "Food", 
-        date: DateTime.now().subtract(Duration(days: 2)), 
-        transaction: Random().nextDouble() * 1000 * (Random().nextBool() ? 1 : -1),
+        transactionDate: DateTime.now().subtract(Duration(days: 2)), 
+        transactionAmount: Random().nextDouble() * 1000 * (Random().nextBool() ? 1 : -1),
         icon: Icon(Icons.dining, size: 50)
       )
     )
@@ -531,223 +530,7 @@ Future<void> showBlurredFormDialog(BuildContext context) async {
             color: Colors.transparent,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
-                  border: BoxBorder.all(color: primaryColor, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColorShadow,
-                      offset: Offset(2, 2),
-                      blurRadius: 4,
-                      spreadRadius: 1
-                    )
-                  ]
-                ),
-                
-                child: Column(
-                  spacing: 20,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    
-                    Center(
-                      child: Text(
-                        "Add Transaction",
-                        style: GoogleFonts.lexend(
-                          color: fadedBlack,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ),
-
-                    TransactionTypeInput(inputLabelHeaderStyle: inputLabelHeaderStyle),
-
-                    DateInput(inputLabelHeaderStyle: inputLabelHeaderStyle),
-
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 10,
-                      children: [
-                          Text(
-                          "Amount:",
-                          style: inputLabelHeaderStyle,
-                        ),
-                        
-                        Flexible(child: TransactionAmountInputButton()),
-                      ],
-                    ),
-
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 10,
-                      children: [
-                          Text(
-                          "Category:",
-                          style: inputLabelHeaderStyle,
-                        ),
-                        
-                        Flexible(
-                          child: GenericDropdownButton(
-                            dropdownValues: [
-                              "Food",
-                              "Transporation",
-                              "Social",
-                              "Household"
-                            ],
-                          )
-                        ),
-                      ],
-                    ),
-
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 10,
-                      children: [
-                          Text(
-                          "Account:",
-                          style: inputLabelHeaderStyle,
-                        ),
-                        
-                        Flexible(
-                          child: GenericDropdownButton(
-                            borderColor: primaryColor,
-                            dropdownValues: [
-                              "Cash",
-                              "GoTyme Savings",
-                              "Unionbank Savings",
-                              "GCash"
-                            ],
-                          )
-                        ),
-                      ],
-                    ),
-
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 10,
-                      children: [
-                          Text(
-                          "Title:",
-                          style: inputLabelHeaderStyle,
-                        ),
-                        
-                        Flexible(
-                          child: DebouncedAutocomplete()
-                        ),
-                      ],
-                    ),
-
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 10,
-                      children: [
-                          Text(
-                          "Description:",
-                          style: inputLabelHeaderStyle,
-                        ),
-                        
-                        Flexible(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(minHeight: 100),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: appBackgroundColor,
-                                border: BoxBorder.all(color: fadedBlack, width: 2),
-                                borderRadius: BorderRadius.circular(4),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: fadedBlack,
-                                    offset: Offset(2, 2),
-                                    blurRadius: 4
-                                  )
-                                ]
-                              ),
-                              child: TextField(
-                                minLines: 1,
-                                maxLines: 10,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.all(8),
-                                  border: InputBorder.none
-                                ),
-                                style: GoogleFonts.lexend(
-                                  color: fadedBlack,
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 14
-                                ),
-                              ),
-                            ),
-                          )
-                        ),
-                      ],
-                    ),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 10,
-                      children: [
-                        TextButton(
-                          style: ButtonStyle(
-                            minimumSize: WidgetStatePropertyAll(Size(150, 50)),
-                            shape: WidgetStatePropertyAll(
-                              RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: netLossColor,
-                                  width: 1,
-                                ),
-                                borderRadius: BorderRadiusGeometry.circular(4)
-                              )
-                            )
-                          ),
-                          child: Text(
-                            "Discard",
-                            style: GoogleFonts.lexend(
-                              color: fadedBlack, 
-                              fontWeight: FontWeight.w300,
-                              fontSize: 16
-                            ),
-                          ),
-                          onPressed: () {
-                        
-                          }, 
-                        ),
-
-                        TextButton(
-                          style: ButtonStyle(
-                            minimumSize: WidgetStatePropertyAll(Size(150, 50)),
-                            backgroundColor: WidgetStatePropertyAll(netGainColor),
-                            shape: WidgetStatePropertyAll(
-                              RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: netGainColorAlternative,
-                                  width: 1,
-                                ),
-                                borderRadius: BorderRadiusGeometry.circular(4)
-                              )
-                            )
-                          ),
-
-                          child: Text(
-                            "Add",
-                            style: GoogleFonts.lexend(
-                              color: fadedBlack,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18
-                            ),
-                          ),
-                          onPressed: () {
-
-                          }, 
-                        )  
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              child: TransactionWindow(inputLabelHeaderStyle: inputLabelHeaderStyle),
             ),
           ),
         ),
@@ -768,6 +551,343 @@ Future<void> showBlurredFormDialog(BuildContext context) async {
       );
     },
   );
+}
+
+class TransactionWindow extends StatefulWidget {
+  const TransactionWindow({
+    super.key,
+    required this.inputLabelHeaderStyle,
+  });
+
+  final TextStyle inputLabelHeaderStyle;
+
+  @override
+  State<TransactionWindow> createState() => _TransactionWindowState();
+}
+
+
+class _TransactionWindowState extends State<TransactionWindow> {
+
+  final TransactionModel _transactionToAdd = TransactionModel(
+    title: "", 
+    category: "", 
+    transactionDate: DateTime.now(), 
+    transactionAmount: 0.00, 
+    transType: TransactionType.income
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(4),
+        border: BoxBorder.all(color: primaryColor, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColorShadow,
+            offset: Offset(2, 2),
+            blurRadius: 4,
+            spreadRadius: 1
+          )
+        ]
+      ),
+      
+      child: Column(
+        spacing: 20,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          
+          Center(
+            child: Text(
+              "Add Transaction",
+              style: GoogleFonts.lexend(
+                color: fadedBlack,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+          ),
+    
+          TransactionTypeInput(inputLabelHeaderStyle: widget.inputLabelHeaderStyle),
+    
+          DateInput(inputLabelHeaderStyle: widget.inputLabelHeaderStyle),
+    
+          AmountInput(widget: widget),
+    
+          CategoryInput(widget: widget),
+    
+          AccountInput(widget: widget),
+    
+          TitleInput(widget: widget),
+    
+          DescriptionInput(widget: widget),
+    
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: 10,
+            children: [
+              DiscardButton(),
+    
+              ConfirmButton()  
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ConfirmButton extends StatelessWidget {
+  const ConfirmButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      style: ButtonStyle(
+        minimumSize: WidgetStatePropertyAll(Size(150, 50)),
+        backgroundColor: WidgetStatePropertyAll(netGainColor),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            side: BorderSide(
+              color: netGainColorAlternative,
+              width: 1,
+            ),
+            borderRadius: BorderRadiusGeometry.circular(4)
+          )
+        )
+      ),
+        
+      child: Text(
+        "Confirm",
+        style: GoogleFonts.lexend(
+          color: fadedBlack,
+          fontWeight: FontWeight.bold,
+          fontSize: 18
+        ),
+      ),
+      onPressed: () {
+        
+      }, 
+    );
+  }
+}
+
+class DiscardButton extends StatelessWidget {
+  const DiscardButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      style: ButtonStyle(
+        minimumSize: WidgetStatePropertyAll(Size(150, 50)),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            side: BorderSide(
+              color: netLossColor,
+              width: 1,
+            ),
+            borderRadius: BorderRadiusGeometry.circular(4)
+          )
+        )
+      ),
+      child: Text(
+        "Discard",
+        style: GoogleFonts.lexend(
+          color: fadedBlack, 
+          fontWeight: FontWeight.w300,
+          fontSize: 16
+        ),
+      ),
+      onPressed: () {
+    
+      }, 
+    );
+  }
+}
+
+class DescriptionInput extends StatelessWidget {
+  const DescriptionInput({
+    super.key,
+    required this.widget,
+  });
+
+  final TransactionWindow widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 10,
+      children: [
+          Text(
+          "Description:",
+          style: widget.inputLabelHeaderStyle,
+        ),
+        
+        Flexible(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: 100),
+            child: Container(
+              decoration: BoxDecoration(
+                color: appBackgroundColor,
+                border: BoxBorder.all(color: fadedBlack, width: 2),
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: [
+                  BoxShadow(
+                    color: fadedBlack,
+                    offset: Offset(2, 2),
+                    blurRadius: 4
+                  )
+                ]
+              ),
+              child: TextField(
+                minLines: 1,
+                maxLines: 10,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(8),
+                  border: InputBorder.none
+                ),
+                style: GoogleFonts.lexend(
+                  color: fadedBlack,
+                  fontWeight: FontWeight.w300,
+                  fontSize: 14
+                ),
+              ),
+            ),
+          )
+        ),
+      ],
+    );
+  }
+}
+
+class TitleInput extends StatelessWidget {
+  const TitleInput({
+    super.key,
+    required this.widget,
+  });
+
+  final TransactionWindow widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 10,
+      children: [
+          Text(
+          "Title:",
+          style: widget.inputLabelHeaderStyle,
+        ),
+        
+        Flexible(
+          child: DebouncedAutocomplete()
+        ),
+      ],
+    );
+  }
+}
+
+class AccountInput extends StatelessWidget {
+  const AccountInput({
+    super.key,
+    required this.widget,
+  });
+
+  final TransactionWindow widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 10,
+      children: [
+          Text(
+          "Account:",
+          style: widget.inputLabelHeaderStyle,
+        ),
+        
+        Flexible(
+          child: GenericDropdownButton(
+            borderColor: primaryColor,
+            dropdownValues: [
+              "Cash",
+              "GoTyme Savings",
+              "Unionbank Savings",
+              "GCash"
+            ],
+          )
+        ),
+      ],
+    );
+  }
+}
+
+class CategoryInput extends StatelessWidget {
+  const CategoryInput({
+    super.key,
+    required this.widget,
+  });
+
+  final TransactionWindow widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 10,
+      children: [
+          Text(
+          "Category:",
+          style: widget.inputLabelHeaderStyle,
+        ),
+        
+        Flexible(
+          child: GenericDropdownButton(
+            dropdownValues: [
+              "Food",
+              "Transporation",
+              "Social",
+              "Household"
+            ],
+          )
+        ),
+      ],
+    );
+  }
+}
+
+class AmountInput extends StatelessWidget {
+  const AmountInput({
+    super.key,
+    required this.widget,
+  });
+
+  final TransactionWindow widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 10,
+      children: [
+          Text(
+          "Amount:",
+          style: widget.inputLabelHeaderStyle,
+        ),
+        
+        Flexible(child: TransactionAmountInputButton()),
+      ],
+    );
+  }
 }
 
 class DateInput extends StatelessWidget {
@@ -818,9 +938,7 @@ class TransactionTypeInput extends StatelessWidget {
         ),
     
         Expanded(
-          child: TransactionTypeDropdownButton(
-            
-          ),
+          child: TransactionTypeDropdownButton(),
         ),
       ],
     );

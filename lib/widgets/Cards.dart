@@ -7,11 +7,11 @@ import 'package:google_fonts/google_fonts.dart';
 class ExpenseCard extends StatelessWidget {
   const ExpenseCard(
     {
-      super.key, required BudgetEntry budgetEntry
+      super.key, required TransactionModel budgetEntry
     }
   ): _budgetEntry = budgetEntry;
 
-  final BudgetEntry _budgetEntry;
+  final TransactionModel _budgetEntry;
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +54,10 @@ class ExpenseCard extends StatelessWidget {
         ),
 
         Text(
-          getFormattedCurrencyAmount(_budgetEntry.transaction),
+          getFormattedCurrencyAmount(_budgetEntry.transactionAmount),
           style: GoogleFonts.lexend(
             fontWeight: FontWeight.w300,
-            color: _budgetEntry.transaction > 0 ? netGainColorAlternative : netLossColor,
+            color: _budgetEntry.transactionAmount > 0 ? netGainColorAlternative : netLossColor,
             fontSize: 15,
           ),
         )
