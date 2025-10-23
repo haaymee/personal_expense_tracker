@@ -252,19 +252,38 @@ class TransactionTypeDropdownButtonState extends State<TransactionTypeDropdownBu
 class TransactionAmountInputButton extends StatefulWidget {
   TransactionAmountInputButton({
     super.key,
+    required this.onAmountInputChangedCallback,
+
     this.inputBoxDeco,
     this.currencyTextStyle
   });
 
+  Function(double) onAmountInputChangedCallback;
+
   BoxDecoration? inputBoxDeco;
   TextStyle? currencyTextStyle;
+
+  double inputAmount = 0.00;
 
   @override
   State<TransactionAmountInputButton> createState() => _TransactionAmountInputButtonState();
 }
 
 class _TransactionAmountInputButtonState extends State<TransactionAmountInputButton> {
-  
+
+  Timer? _debounceTimer;
+
+  void onAmountInputChanged(double newAmount)
+  {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 0), () {
+
+      widget.inputAmount = newAmount;
+      widget.onAmountInputChangedCallback(widget.inputAmount);
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -292,12 +311,20 @@ class _TransactionAmountInputButtonState extends State<TransactionAmountInputBut
         decoration: InputDecoration(
           isDense: true,
           border:InputBorder.none,
-          hintText: "₱ 0.00",
+          hintText: "₱ ${widget.inputAmount.toStringAsFixed(2)}",
           hintStyle: widget.currencyTextStyle ?? GoogleFonts.lexend(
             color: fadedBlack.withValues(alpha: .4),
             fontWeight: FontWeight.w300
           )
         ),
+
+        onChanged: (value) {
+
+          String cleaned = value.replaceAll(RegExp(r'[^\d.]'), '');
+          double parsedAmount = double.tryParse(cleaned) ?? 0.0;
+
+          onAmountInputChanged(parsedAmount);
+        },
       ),
     );
   }

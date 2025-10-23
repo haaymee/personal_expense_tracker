@@ -611,6 +611,39 @@ class _TransactionWindowState extends State<TransactionWindow> {
     });     
   }
 
+  void updateTransactionAmount(double newTransactionAmount)
+  {
+    _transactionToAdd.transactionAmount = newTransactionAmount;
+  }
+
+  void updateTransactionCategory(String newCategory)
+  {
+    setState(() {
+      _transactionToAdd.category = newCategory;
+    });     
+  }
+
+  void updateTransactionAccount(String newAccount)
+  {
+    setState(() {
+      _transactionToAdd.account = newAccount;
+    });     
+  }
+
+  void updateTransactionTitle(String newTitle)
+  {
+    setState(() {
+      _transactionToAdd.title = newTitle;
+    });     
+  }
+
+  void updateTransactionDescription(String newDescription)
+  {
+    setState(() {
+      _transactionToAdd.description = newDescription;
+    });     
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -659,7 +692,10 @@ class _TransactionWindowState extends State<TransactionWindow> {
             updateTimeCallback: updateTransactionTime,
           ),
     
-          AmountInput(widget: widget),
+          AmountInput(
+            widget: widget,
+            updateTransactionAmountCallback: updateTransactionAmount,
+          ),
     
           CategoryInput(widget: widget),
     
@@ -913,9 +949,11 @@ class AmountInput extends StatelessWidget {
   const AmountInput({
     super.key,
     required this.widget,
+    required this.updateTransactionAmountCallback
   });
 
   final TransactionWindow widget;
+  final Function(double) updateTransactionAmountCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -928,7 +966,11 @@ class AmountInput extends StatelessWidget {
           style: widget.inputLabelHeaderStyle,
         ),
         
-        Flexible(child: TransactionAmountInputButton()),
+        Flexible(
+          child: TransactionAmountInputButton(
+            onAmountInputChangedCallback: updateTransactionAmountCallback,
+          )
+        ),
       ],
     );
   }
