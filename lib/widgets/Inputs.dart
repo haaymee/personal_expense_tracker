@@ -421,12 +421,15 @@ class DebouncedAutocomplete extends StatefulWidget {
     this.inputBoxDeco,
     this.listBoxDeco,
     this.labelTextStyle,
+    required this.onTitleSelectedCallback
   });
 
   BoxDecoration? inputBoxDeco;
   BoxDecoration? listBoxDeco;
 
   TextStyle? labelTextStyle;
+  
+  final Function(String?) onTitleSelectedCallback;
 
   @override
   State<DebouncedAutocomplete> createState() => _DebouncedAutocompleteState();
@@ -460,6 +463,8 @@ class _DebouncedAutocompleteState extends State<DebouncedAutocomplete> {
           .where((title) => title.toLowerCase().contains(query.toLowerCase()))
           .toList();
       _filtered.value = filtered;
+
+
     });
   }
 
@@ -478,6 +483,8 @@ class _DebouncedAutocompleteState extends State<DebouncedAutocomplete> {
 
         // Trigger debounced filtering
         _debounceFilter(query);
+
+        widget.onTitleSelectedCallback(query);
 
         // Return the latest computed results (via ValueNotifier)
         return _filtered.value;
@@ -545,7 +552,7 @@ class _DebouncedAutocompleteState extends State<DebouncedAutocomplete> {
       },
       
       onSelected: (value) {
-        debugPrint('Selected: $value');
+        widget.onTitleSelectedCallback(value);
       },
     );
   }

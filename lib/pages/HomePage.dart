@@ -616,32 +616,37 @@ class _TransactionWindowState extends State<TransactionWindow> {
     _transactionToAdd.transactionAmount = newTransactionAmount;
   }
 
-  void updateTransactionCategory(String newCategory)
+  void updateTransactionCategory(String? newCategory)
   {
-    setState(() {
+    if (newCategory != null)
+    {
       _transactionToAdd.category = newCategory;
-    });     
+    }
   }
 
-  void updateTransactionAccount(String newAccount)
+  void updateTransactionAccount(String? newAccount)
   {
-    setState(() {
+    if (newAccount != null)
+    {
       _transactionToAdd.account = newAccount;
-    });     
+    }
   }
 
-  void updateTransactionTitle(String newTitle)
+  void updateTransactionTitle(String? newTitle)
   {
-    setState(() {
+    if (newTitle != null)
+    {
       _transactionToAdd.title = newTitle;
-    });     
+    }
   }
 
-  void updateTransactionDescription(String newDescription)
+  void updateTransactionDescription(String? newDescription)
   {
-    setState(() {
+    if (newDescription != null)
+    {
       _transactionToAdd.description = newDescription;
-    });     
+      print(newDescription);
+    }
   }
 
   @override
@@ -697,13 +702,25 @@ class _TransactionWindowState extends State<TransactionWindow> {
             updateTransactionAmountCallback: updateTransactionAmount,
           ),
     
-          CategoryInput(widget: widget),
+          CategoryInput(
+            widget: widget,
+            updateTransactionCategoryCallback: updateTransactionCategory,
+          ),
     
-          AccountInput(widget: widget),
+          AccountInput(
+            widget: widget,
+            updateTransactionAmountInputCallback: updateTransactionAccount,
+          ),
     
-          TitleInput(widget: widget),
+          TitleInput(
+            widget: widget,
+            onTitleChangedCallback: updateTransactionTitle,
+          ),
     
-          DescriptionInput(widget: widget),
+          DescriptionInput(
+            widget: widget,
+            onDescriptionChangedCallback: updateTransactionDescription,
+          ),
     
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -797,9 +814,11 @@ class DescriptionInput extends StatelessWidget {
   const DescriptionInput({
     super.key,
     required this.widget,
+    required this.onDescriptionChangedCallback
   });
 
   final TransactionWindow widget;
+  final Function(String?) onDescriptionChangedCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -840,6 +859,7 @@ class DescriptionInput extends StatelessWidget {
                   fontWeight: FontWeight.w300,
                   fontSize: 14
                 ),
+                onChanged: onDescriptionChangedCallback,
               ),
             ),
           )
@@ -853,9 +873,11 @@ class TitleInput extends StatelessWidget {
   const TitleInput({
     super.key,
     required this.widget,
+    required this.onTitleChangedCallback
   });
 
   final TransactionWindow widget;
+  final Function(String?) onTitleChangedCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -869,7 +891,9 @@ class TitleInput extends StatelessWidget {
         ),
         
         Flexible(
-          child: DebouncedAutocomplete()
+          child: DebouncedAutocomplete(
+            onTitleSelectedCallback: onTitleChangedCallback,
+          )
         ),
       ],
     );
@@ -880,9 +904,11 @@ class AccountInput extends StatelessWidget {
   const AccountInput({
     super.key,
     required this.widget,
+    required this.updateTransactionAmountInputCallback
   });
 
   final TransactionWindow widget;
+  final Function(String?) updateTransactionAmountInputCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -904,6 +930,7 @@ class AccountInput extends StatelessWidget {
               "Unionbank Savings",
               "GCash"
             ],
+            onSelectedCallback: updateTransactionAmountInputCallback,
           )
         ),
       ],
@@ -915,9 +942,11 @@ class CategoryInput extends StatelessWidget {
   const CategoryInput({
     super.key,
     required this.widget,
+    required this.updateTransactionCategoryCallback
   });
 
   final TransactionWindow widget;
+  final Function(String?) updateTransactionCategoryCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -938,6 +967,7 @@ class CategoryInput extends StatelessWidget {
               "Social",
               "Household"
             ],
+            onSelectedCallback: updateTransactionCategoryCallback,
           )
         ),
       ],
