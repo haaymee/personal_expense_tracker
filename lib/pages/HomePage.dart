@@ -639,7 +639,112 @@ Future<void> showBlurredFormDialog(BuildContext context) async {
                           child: DebouncedAutocomplete()
                         ),
                       ],
-                    )
+                    ),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 10,
+                      children: [
+                          Text(
+                          "Description:",
+                          style: inputLabelHeaderStyle,
+                        ),
+                        
+                        Flexible(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minHeight: 100),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: appBackgroundColor,
+                                border: BoxBorder.all(color: fadedBlack, width: 2),
+                                borderRadius: BorderRadius.circular(4),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: fadedBlack,
+                                    offset: Offset(2, 2),
+                                    blurRadius: 4
+                                  )
+                                ]
+                              ),
+                              child: TextField(
+                                minLines: 1,
+                                maxLines: 10,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.all(8),
+                                  border: InputBorder.none
+                                ),
+                                style: GoogleFonts.lexend(
+                                  color: fadedBlack,
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 14
+                                ),
+                              ),
+                            ),
+                          )
+                        ),
+                      ],
+                    ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 10,
+                      children: [
+                        TextButton(
+                          style: ButtonStyle(
+                            minimumSize: WidgetStatePropertyAll(Size(150, 50)),
+                            shape: WidgetStatePropertyAll(
+                              RoundedRectangleBorder(
+                                side: BorderSide(
+                                  color: netLossColor,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadiusGeometry.circular(4)
+                              )
+                            )
+                          ),
+                          child: Text(
+                            "Discard",
+                            style: GoogleFonts.lexend(
+                              color: fadedBlack, 
+                              fontWeight: FontWeight.w300,
+                              fontSize: 16
+                            ),
+                          ),
+                          onPressed: () {
+                        
+                          }, 
+                        ),
+
+                        TextButton(
+                          style: ButtonStyle(
+                            minimumSize: WidgetStatePropertyAll(Size(150, 50)),
+                            backgroundColor: WidgetStatePropertyAll(netGainColor),
+                            shape: WidgetStatePropertyAll(
+                              RoundedRectangleBorder(
+                                side: BorderSide(
+                                  color: netGainColorAlternative,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadiusGeometry.circular(4)
+                              )
+                            )
+                          ),
+
+                          child: Text(
+                            "Add",
+                            style: GoogleFonts.lexend(
+                              color: fadedBlack,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18
+                            ),
+                          ),
+                          onPressed: () {
+
+                          }, 
+                        )  
+                      ],
+                    ),
                   ],
                 ),
               ),
