@@ -1,6 +1,8 @@
 import 'package:expenses_tracker/colors.dart';
+import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:svg_flutter/svg.dart';
@@ -257,4 +259,58 @@ class TransactionTypeDropdownButtonState extends State<TransactionTypeDropdownBu
   }
 
 
+}
+
+class TransactionAmountInputButton extends StatefulWidget {
+  TransactionAmountInputButton({
+    super.key,
+    this.inputBoxDeco,
+    this.currencyTextStyle
+  });
+
+  BoxDecoration? inputBoxDeco;
+  TextStyle? currencyTextStyle;
+
+  @override
+  State<TransactionAmountInputButton> createState() => _TransactionAmountInputButtonState();
+}
+
+class _TransactionAmountInputButtonState extends State<TransactionAmountInputButton> {
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: widget.inputBoxDeco ?? BoxDecoration(
+        border: BoxBorder.fromLTRB(
+          bottom: BorderSide(
+            color: fadedBlack,
+            width: 2
+          )
+        )
+      ),
+
+      child: TextFormField(
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          CurrencyInputFormatter(
+            useSymbolPadding: true,
+            leadingSymbol: "₱"
+          ),
+        ],
+        style: widget.currencyTextStyle ?? GoogleFonts.lexend(
+          color: fadedBlack,
+          fontWeight: FontWeight.w300
+        ),
+        decoration: InputDecoration(
+          isDense: true,
+          border:InputBorder.none,
+          hintText: "₱ 0.00",
+          hintStyle: widget.currencyTextStyle ?? GoogleFonts.lexend(
+            color: fadedBlack.withValues(alpha: .4),
+            fontWeight: FontWeight.w300
+          )
+        ),
+      ),
+    );
+  }
 }

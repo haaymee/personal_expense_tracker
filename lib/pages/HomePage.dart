@@ -564,39 +564,22 @@ Future<void> showBlurredFormDialog(BuildContext context) async {
                       ),
                     ),
 
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 10,
-                      children: [
-                        Text(
-                          "Transaction Type:",
-                          style: inputLabelHeaderStyle,
-                        ),
+                    TransactionTypeInput(inputLabelHeaderStyle: inputLabelHeaderStyle),
 
-                        Expanded(
-                          child: TransactionTypeDropdownButton(
-                            
-                          ),
-                        ),
-                      ],
-                    ),
+                    DateInput(inputLabelHeaderStyle: inputLabelHeaderStyle),
 
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       spacing: 10,
                       children: [
-                        Text(
-                          "Date:",
+                          Text(
+                          "Amount:",
                           style: inputLabelHeaderStyle,
                         ),
-
-                        Flexible(
-                          child: DateTimePickerButton(
-                          )
-                        ),
+                        
+                        Flexible(child: TransactionAmountInputButton()),
                       ],
                     )
-                    
                   ],
                 ),
               ),
@@ -620,4 +603,61 @@ Future<void> showBlurredFormDialog(BuildContext context) async {
       );
     },
   );
+}
+
+class DateInput extends StatelessWidget {
+  const DateInput({
+    super.key,
+    required this.inputLabelHeaderStyle,
+  });
+
+  final TextStyle inputLabelHeaderStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 10,
+      children: [
+        Text(
+          "Date:",
+          style: inputLabelHeaderStyle,
+        ),
+    
+        Flexible(
+          child: DateTimePickerButton(
+          )
+        ),
+      ],
+    );
+  }
+}
+
+class TransactionTypeInput extends StatelessWidget {
+  const TransactionTypeInput({
+    super.key,
+    required this.inputLabelHeaderStyle,
+  });
+
+  final TextStyle inputLabelHeaderStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 10,
+      children: [
+        Text(
+          "Transaction Type:",
+          style: inputLabelHeaderStyle,
+        ),
+    
+        Expanded(
+          child: TransactionTypeDropdownButton(
+            
+          ),
+        ),
+      ],
+    );
+  }
 }
