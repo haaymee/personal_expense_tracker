@@ -655,8 +655,8 @@ class _TransactionWindowState extends State<TransactionWindow> {
           DateInput(
             inputLabelHeaderStyle: widget.inputLabelHeaderStyle,
             dateTimeToShow: _transactionToAdd.transactionDate,
-            updateDateCallback: ,
-            updateTimeCallback: ,
+            updateDateCallback: updateTransactionDate,
+            updateTimeCallback: updateTransactionTime,
           ),
     
           AmountInput(widget: widget),
