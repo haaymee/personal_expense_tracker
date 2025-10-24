@@ -9,7 +9,7 @@ class TransactionModel {
     String? id,
     required this.title,
     required this.category,
-    required this.transactionDate,
+    required this.transactionDateTime,
     required this.transactionAmount,
     required this.transType,
     this.transferFees = 0.0,
@@ -29,9 +29,15 @@ class TransactionModel {
   String toAccount;
   double transactionAmount;
   double transferFees;
-  DateTime transactionDate;
+  DateTime transactionDateTime;
   String description;
   Icon? icon;
+
+  DateTime get dateOnly => DateTime(
+    transactionDateTime.year, 
+    transactionDateTime.month,
+    transactionDateTime.day
+  );
 
   TransactionModel copyWith({
     String? id,
@@ -56,7 +62,7 @@ class TransactionModel {
       toAccount: toAccount ?? this.toAccount,
       transactionAmount: transactionAmount ?? this.transactionAmount,
       transferFees: transferFees ?? this.transferFees,
-      transactionDate: date ?? this.transactionDate,
+      transactionDateTime: date ?? this.transactionDateTime,
       description: description ?? this.description,
       icon: icon ?? this.icon,
       transType: transType ?? this.transType,
@@ -67,7 +73,7 @@ class TransactionModel {
   {
     print('''
       Transaction Type: ${transType.name}
-      Date: ${DateFormat("dd/MM/yy (E)").format(transactionDate)},
+      Date: ${DateFormat("dd/MM/yy (E)").format(transactionDateTime)},
       Transaction Amount: $transactionAmount
       Category: $category,
       Account: $account,

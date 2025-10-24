@@ -57,7 +57,11 @@ class ExpenseCard extends StatelessWidget {
           getFormattedCurrencyAmount(_budgetEntry.transactionAmount),
           style: GoogleFonts.lexend(
             fontWeight: FontWeight.w300,
-            color: _budgetEntry.transactionAmount > 0 ? netGainColorAlternative : netLossColor,
+            color: switch (_budgetEntry.transType) {
+              TransactionType.income => netGainColor,
+              TransactionType.expense => netLossColor,
+              TransactionType.transfer => secondaryColor,
+            },
             fontSize: 15,
           ),
         )

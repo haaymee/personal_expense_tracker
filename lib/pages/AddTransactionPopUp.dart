@@ -1,9 +1,11 @@
 import 'dart:ui';
 import 'package:expenses_tracker/colors.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
+import 'package:expenses_tracker/services/TransactionService.dart';
 import 'package:expenses_tracker/widgets/Inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class TransactionWindow extends StatefulWidget {
   TransactionWindow({
@@ -36,7 +38,7 @@ class _TransactionWindowState extends State<TransactionWindow> {
   final TransactionModel _transactionToAdd = TransactionModel(
     title: "", 
     category: "", 
-    transactionDate: DateTime.now(), 
+    transactionDateTime: DateTime.now(), 
     transactionAmount: 0.00, 
     transType: TransactionType.income,
   );
@@ -50,8 +52,6 @@ class _TransactionWindowState extends State<TransactionWindow> {
     _transactionToAdd.account = widget.accounts[0];
     _transactionToAdd.fromAccount = widget.accounts[0];
     _transactionToAdd.toAccount = widget.accounts[0];
-
-    _transactionToAdd.printTransaction();
   }
 
   void updateTransactionType(String? newTransType)
@@ -67,7 +67,7 @@ class _TransactionWindowState extends State<TransactionWindow> {
   void updateTransactionDate(DateTime newDate)
   {
     setState(() {
-      _transactionToAdd.transactionDate = _transactionToAdd.transactionDate.copyWith(
+      _transactionToAdd.transactionDateTime = _transactionToAdd.transactionDateTime.copyWith(
         year: newDate.year,
         month: newDate.month,
         day: newDate.day
@@ -78,7 +78,7 @@ class _TransactionWindowState extends State<TransactionWindow> {
   void updateTransactionTime(TimeOfDay newDateTimeOfDay)
   {
     setState(() {
-      _transactionToAdd.transactionDate = _transactionToAdd.transactionDate.copyWith(
+      _transactionToAdd.transactionDateTime = _transactionToAdd.transactionDateTime.copyWith(
         hour: newDateTimeOfDay.hour,
         minute: newDateTimeOfDay.minute
       );
@@ -181,7 +181,7 @@ class _TransactionWindowState extends State<TransactionWindow> {
     
           DateInput(
             inputLabelHeaderStyle: widget.inputLabelHeaderStyle,
-            dateTimeToShow: _transactionToAdd.transactionDate,
+            dateTimeToShow: _transactionToAdd.transactionDateTime,
             updateDateCallback: updateTransactionDate,
             updateTimeCallback: updateTransactionTime,
           ),
@@ -247,7 +247,8 @@ class _TransactionWindowState extends State<TransactionWindow> {
     
               ConfirmButton(
                 onButtonPressed: () {
-                  _transactionToAdd.printTransaction();
+                  context.read<TransactionService>().addTransaction(_transactionToAdd);
+                  Navigator.of(context).pop();
                 },
               )  
             ],

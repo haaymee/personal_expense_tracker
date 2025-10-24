@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:expenses_tracker/colors.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
 import 'package:expenses_tracker/pages/AddTransactionPopUp.dart';
+import 'package:expenses_tracker/services/TransactionService.dart';
 import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:expenses_tracker/widgets/Cards.dart';
 import 'package:expenses_tracker/widgets/Inputs.dart';
@@ -11,21 +12,17 @@ import 'package:expenses_tracker/widgets/Labels.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:svg_flutter/svg_flutter.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
-  final Color netLossColor = Colors.pink;
-  final Color netGainColor = Colors.green;
-
-  final Map<DateTime, List<TransactionModel>> _budgets = {
-    
-  };
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
+    final _transactions = context.watch<TransactionService>().transactionsGroupedByDate;
 
     return Scaffold(
       backgroundColor: appBackgroundColor,
@@ -74,43 +71,51 @@ class HomePage extends StatelessWidget {
 
       ),
 
-
       body: Stack(
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 70),
             child: CustomScrollView(
               slivers: [
-                for (final date in _budgets.keys) ...[
+                for (final date in _transactions.keys) ...[
+
                   MultiSliver(
                     pushPinnedChildren: true,
                     children: [
-                      DatedExpensesPinnedHeader(
-                        date: date, 
-                        label: getFormattedCurrencyAmount(100000),
-                        isNetGain: Random().nextBool(),
-                        dateStyle: GoogleFonts.lexend(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: fadedBlack
-                        ),
-                        labelStyle: GoogleFonts.lexend(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: fadedBlack
-                        ),
+                      Builder(
+                        builder: (context) {
+
+                          double netExpenses = context.watch<TransactionService>()
+                            .getTransactionsNetExpense(_transactions[date]!);
+
+                          return DatedExpensesPinnedHeader(
+                            date: date, 
+                            label: getFormattedCurrencyAmount(netExpenses),
+                            isNetGain: netExpenses > 0,
+                            dateStyle: GoogleFonts.lexend(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: fadedBlack
+                            ),
+                            labelStyle: GoogleFonts.lexend(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: fadedBlack
+                            ),
+                          );
+                        }
                       ),
                     
                       SliverList(delegate: SliverChildBuilderDelegate(
                           (content, index)
                           {
-                            bool shouldAddDivider = index != _budgets[date]!.length-1;
+                            bool shouldAddDivider = index != _transactions[date]!.length-1;
 
                             return Column(
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 10),
-                                  child: ExpenseCard(budgetEntry: _budgets[date]![index]),
+                                  child: ExpenseCard(budgetEntry: _transactions[date]![index]),
                                 ),
                                 if (shouldAddDivider) 
                                 Divider(
@@ -121,7 +126,7 @@ class HomePage extends StatelessWidget {
                               ],
                             );
                           },
-                          childCount: _budgets[date]!.length
+                          childCount: _transactions[date]!.length
                         )
                       )
                     ],
@@ -133,12 +138,16 @@ class HomePage extends StatelessWidget {
           
           IgnorePointer(
             child: HeadingBalanceContainer(
+              balance: 0,
+              expenses: context.watch<TransactionService>().getTotalExpenses(),
+              income: context.watch<TransactionService>().getTotalIncome(),
+            
               height: 75,
               dividerHeight: 50,
               dividerThickness: 1.75,
-            ),
+            )
           ),
-
+          
           Positioned(
             left: 0,
             right: 0,
@@ -184,8 +193,6 @@ class HomePage extends StatelessWidget {
               ],
             )
           )
-
-
         ],
       ),
 
@@ -373,11 +380,19 @@ class DatedExpensesPinnedHeader extends StatelessWidget {
 class HeadingBalanceContainer extends StatelessWidget {
   const HeadingBalanceContainer({
     super.key,
+    required this.expenses,
+    required this.income,
+    required this.balance,
+
     this.width, 
     this.height,
     this.dividerThickness,
     this.dividerHeight
   });
+
+  final double expenses;
+  final double income;
+  final double balance;
 
   final double? width;
   final double? height;
@@ -413,7 +428,7 @@ class HeadingBalanceContainer extends StatelessWidget {
                 color: appBackgroundColor
               ),
               
-              counterVal: getFormattedCurrencyAmount(3000),
+              counterVal: getFormattedCurrencyAmount(expenses),
               counterStyle: GoogleFonts.lexend(
                 color: appBackgroundColor
               ),
@@ -434,7 +449,7 @@ class HeadingBalanceContainer extends StatelessWidget {
                 color: appBackgroundColor
               ),
 
-              counterVal: getFormattedCurrencyAmount(60000),
+              counterVal: getFormattedCurrencyAmount(income),
               counterStyle: GoogleFonts.lexend(
                 color: appBackgroundColor
               ),
@@ -457,7 +472,7 @@ class HeadingBalanceContainer extends StatelessWidget {
               ),
               
 
-              counterVal: getFormattedCurrencyAmount(57000),
+              counterVal: getFormattedCurrencyAmount(balance),
               counterStyle: GoogleFonts.lexend(
                 color: appBackgroundColor
               ),
