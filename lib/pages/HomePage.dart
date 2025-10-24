@@ -21,48 +21,7 @@ class HomePage extends StatelessWidget {
   final Color netGainColor = Colors.green;
 
   final Map<DateTime, List<TransactionModel>> _budgets = {
-    DateTime.now() : 
-    List<TransactionModel>.generate(
-      10,
-      (index) => TransactionModel(
-        title: "Entry $index", 
-        description: "Description #$index",
-        category: "Food", 
-        transactionDate: DateTime.now(), 
-        transactionAmount: 1000 * Random().nextDouble() * (Random().nextBool() ? 1 : -1),
-        icon: Icon(Icons.dining, size: 50),
-        transType: TransactionType.expense
-      )
-    ),
-
-    DateTime.now().subtract(Duration(days: 1)) : 
-    List<TransactionModel>.generate(
-      10,
-      (index) => TransactionModel(
-        title: "Entry $index", 
-        description: "Description #$index",
-        category: "Food", 
-        transactionDate: DateTime.now().subtract(Duration(days: 1)), 
-        transactionAmount: 1000 * Random().nextDouble() * (Random().nextBool() ? 1 : -1),
-        icon: Icon(Icons.dining, size: 50),
-        transType: TransactionType.expense        
-      )
-    ),
-
-    DateTime.now().subtract(Duration(days: 2)) : 
-    List<TransactionModel>.generate(
-      10,
-      (index) => TransactionModel(
-        title: "Entry $index", 
-        description: "Description #$index",
-        category: "Food", 
-        transactionDate: DateTime.now().subtract(Duration(days: 2)), 
-        transactionAmount: Random().nextDouble() * 1000 * (Random().nextBool() ? 1 : -1),
-        icon: Icon(Icons.dining, size: 50),
-        transType: TransactionType.expense
-
-      )
-    )
+    
   };
 
   @override
