@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 enum TransactionType { income, expense, transfer }
@@ -60,5 +61,22 @@ class TransactionModel {
       icon: icon ?? this.icon,
       transType: transType ?? this.transType,
     );
+  }
+
+  void printTransaction()
+  {
+    print('''
+      Transaction Type: ${transType.name}
+      Date: ${DateFormat("dd/MM/yy (E)").format(transactionDate)},
+      Transaction Amount: $transactionAmount
+      Category: $category,
+      Account: $account,
+      Title: $title,
+      Description: $description,
+
+      From Acc: $fromAccount,
+      To Acc: $toAccount,
+      Transfer Fees: $transferFees
+    ''');
   }
 }
