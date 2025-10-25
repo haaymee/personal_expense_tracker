@@ -1,13 +1,12 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:expenses_tracker/colors.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
 import 'package:expenses_tracker/pages/AddTransactionPopUp.dart';
-import 'package:expenses_tracker/services/TransactionService.dart';
+import 'package:expenses_tracker/repositories/LocalRepository.dart';
+import 'package:expenses_tracker/services/TransactionRepositoryService.dart';
 import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:expenses_tracker/widgets/Cards.dart';
-import 'package:expenses_tracker/widgets/Inputs.dart';
 import 'package:expenses_tracker/widgets/Labels.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,13 +15,39 @@ import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:svg_flutter/svg_flutter.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   HomePage({super.key});
+  
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+  List<TransactionModel> _transactions = []; 
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {      
+      await context.read<TransactionRepositoryProvider>().loadTransactionsByYearAndMonth(
+        DateTime.now().year, 
+        DateTime.now().month
+      );
+
+      for (DateTime date in context.read<TransactionRepositoryProvider>().sortedTransactions.keys)
+      {
+        print(DateFormat("YYYY MM dd").format(date));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) 
   {
-    final _transactions = context.watch<TransactionService>().transactionsGroupedByDate;
+    final transactionRepo = context.watch<TransactionRepositoryProvider>();
+    final _groupedTransactions = transactionRepo.sortedTransactions;
 
     return Scaffold(
       backgroundColor: appBackgroundColor,
@@ -73,74 +98,18 @@ class HomePage extends StatelessWidget {
 
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 70),
-            child: CustomScrollView(
-              slivers: [
-                for (final date in _transactions.keys) ...[
 
-                  MultiSliver(
-                    pushPinnedChildren: true,
-                    children: [
-                      Builder(
-                        builder: (context) {
+          if (_groupedTransactions.isEmpty) ...[
+            const Center(child: Text("No Transactions"))
+          ] else ...[
+              TransactionList(groupedTransactions: _groupedTransactions),
+          ],
 
-                          double netExpenses = context.watch<TransactionService>()
-                            .getTransactionsNetExpense(_transactions[date]!);
-
-                          return DatedExpensesPinnedHeader(
-                            date: date, 
-                            label: getFormattedCurrencyAmount(netExpenses),
-                            isNetGain: netExpenses > 0,
-                            dateStyle: GoogleFonts.lexend(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: fadedBlack
-                            ),
-                            labelStyle: GoogleFonts.lexend(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: fadedBlack
-                            ),
-                          );
-                        }
-                      ),
-                    
-                      SliverList(delegate: SliverChildBuilderDelegate(
-                          (content, index)
-                          {
-                            bool shouldAddDivider = index != _transactions[date]!.length-1;
-
-                            return Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                  child: ExpenseCard(budgetEntry: _transactions[date]![index]),
-                                ),
-                                if (shouldAddDivider) 
-                                Divider(
-                                  height: 21,
-                                  thickness: 1.85,
-                                  color: Color.fromARGB(32, 0, 0, 0),
-                                ),
-                              ],
-                            );
-                          },
-                          childCount: _transactions[date]!.length
-                        )
-                      )
-                    ],
-                  ),
-                ]
-              ],
-            ),
-          ),
-          
           IgnorePointer(
             child: HeadingBalanceContainer(
               balance: 0,
-              expenses: context.watch<TransactionService>().getTotalExpenses(),
-              income: context.watch<TransactionService>().getTotalIncome(),
+              expenses: context.watch<TransactionRepositoryProvider>().getTotalExpenses(),
+              income: context.watch<TransactionRepositoryProvider>().getTotalIncome(),
             
               height: 75,
               dividerHeight: 50,
@@ -197,6 +166,81 @@ class HomePage extends StatelessWidget {
       ),
 
     );
+  }
+}
+
+class TransactionList extends StatelessWidget {
+  const TransactionList({
+    super.key,
+    required Map<DateTime, List<TransactionModel>> groupedTransactions,
+  }) : _groupedTransactions = groupedTransactions;
+
+  final Map<DateTime, List<TransactionModel>> _groupedTransactions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+    padding: const EdgeInsets.only(top: 70),
+    child: CustomScrollView(
+      slivers: [
+        for (final date in _groupedTransactions!.keys) ...[
+    
+          MultiSliver(
+            pushPinnedChildren: true,
+            children: [
+              Builder(
+                builder: (context) {
+    
+                  double netExpenses = context.watch<TransactionRepositoryProvider>()
+                    .getTransactionsNetExpense(_groupedTransactions[date]!);
+    
+                  return DatedExpensesPinnedHeader(
+                    date: date, 
+                    label: getFormattedCurrencyAmount(netExpenses),
+                    isNetGain: netExpenses > 0,
+                    dateStyle: GoogleFonts.lexend(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: fadedBlack
+                    ),
+                    labelStyle: GoogleFonts.lexend(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: fadedBlack
+                    ),
+                  );
+                }
+              ),
+            
+              SliverList(delegate: SliverChildBuilderDelegate(
+                  (content, index)
+                  {
+                    bool shouldAddDivider = index != _groupedTransactions[date]!.length-1;
+    
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: ExpenseCard(budgetEntry: _groupedTransactions[date]![index]),
+                        ),
+                        if (shouldAddDivider) 
+                        Divider(
+                          height: 21,
+                          thickness: 1.85,
+                          color: Color.fromARGB(32, 0, 0, 0),
+                        ),
+                      ],
+                    );
+                  },
+                  childCount: _groupedTransactions[date]!.length
+                )
+              )
+            ],
+          ),
+        ]
+      ],
+    ),
+                );
   }
 }
 

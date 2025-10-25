@@ -5,8 +5,30 @@ import 'package:uuid/uuid.dart';
 enum TransactionType { income, expense, transfer }
 
 class TransactionModel {
+  
+  static TransactionModel fromMap(Map<String, Object?> map)
+  {
+    return TransactionModel(
+      id: map["id"] == null ? -1 : map["id"] as int,
+      title: map["title"] == null ? "" : map["title"] as String, 
+      category: map["category"] == null ? "" : map["category"] as String, 
+      description: map["description"] == null ? "" : map["description"] as String, 
+      
+      transactionDateTime: DateTime.tryParse(
+        (map["transactionDateTime"] == null ? "" : map["transactionDateTime"] as String)
+      ) ?? DateTime.now(),
+
+      transactionAmount: map["transactionAmount"] == null ? 0.0 : map["transactionAmount"] as double,
+      transType: TransactionType.values.byName(map["transactionType"] == null ? "" : map["transactionType"] as String),
+      account: map["account"] == null ? "" : map["account"] as String,
+      fromAccount: map["fromAccount"] == null ? "" : map["fromAccount"] as String,
+      toAccount: map["toAccount"] == null ? "" : map["toAccount"] as String,
+      transferFees: map["transferFees"] == null ? 0.0 : map["transferFees"] as double
+    );
+  }
+
   TransactionModel({
-    String? id,
+    int? id,
     required this.title,
     required this.category,
     required this.transactionDateTime,
@@ -18,9 +40,9 @@ class TransactionModel {
     this.toAccount = "",
     this.description = "",
     this.icon,
-  }) : id = id ?? const Uuid().v4();
+  }) : id = id ?? (Uuid().v4()).hashCode;
 
-  String id;
+  int id;
   String title;
   String category;
   TransactionType transType;
@@ -33,14 +55,8 @@ class TransactionModel {
   String description;
   Icon? icon;
 
-  DateTime get dateOnly => DateTime(
-    transactionDateTime.year, 
-    transactionDateTime.month,
-    transactionDateTime.day
-  );
-
   TransactionModel copyWith({
-    String? id,
+    int? id,
     String? title,
     String? category,
     String? account,
@@ -67,6 +83,22 @@ class TransactionModel {
       icon: icon ?? this.icon,
       transType: transType ?? this.transType,
     );
+  }
+
+  Map<String, Object> toMap()
+  {
+    return {
+      "title": title,
+      "category": category,
+      "account" : account,
+      "fromAccount" : fromAccount,
+      "toAccount" : toAccount,
+      "transactionAmount" : transactionAmount,
+      "transferFees" : transferFees,
+      "transactionDateTime" : transactionDateTime.toIso8601String(),
+      "description" : description,
+      "transactionType" : transType.name,
+    };
   }
 
   void printTransaction()

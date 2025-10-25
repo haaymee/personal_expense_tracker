@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:expenses_tracker/colors.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
-import 'package:expenses_tracker/services/TransactionService.dart';
+import 'package:expenses_tracker/services/TransactionRepositoryService.dart';
 import 'package:expenses_tracker/widgets/Inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -246,8 +246,15 @@ class _TransactionWindowState extends State<TransactionWindow> {
               DiscardButton(),
     
               ConfirmButton(
-                onButtonPressed: () {
-                  context.read<TransactionService>().addTransaction(_transactionToAdd);
+                onButtonPressed: () async {
+                  print(_transactionToAdd.transactionDateTime.toIso8601String());
+
+                  await context.read<TransactionRepositoryProvider>().addTransaction(_transactionToAdd);
+                  await context.read<TransactionRepositoryProvider>().loadTransactionsByYearAndMonth(
+                    DateTime.now().year, 
+                    DateTime.now().month
+                  );
+                  
                   Navigator.of(context).pop();
                 },
               )  

@@ -1,14 +1,19 @@
 import 'package:expenses_tracker/pages/HomePage.dart';
 import 'package:expenses_tracker/pages/LoginPage.dart';
+import 'package:expenses_tracker/repositories/LocalRepository.dart';
 import 'package:expenses_tracker/routes.dart';
-import 'package:expenses_tracker/services/TransactionService.dart';
+import 'package:expenses_tracker/services/TransactionRepositoryService.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final repo = LocalTransactionRepository();
+  await repo.init();
+
   runApp(ChangeNotifierProvider(
-    create: (_) => TransactionService(),
+    create: (_) => TransactionRepositoryProvider(repo),
     child: const MyApp()
     )
   );
