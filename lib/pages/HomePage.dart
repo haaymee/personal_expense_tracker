@@ -194,10 +194,12 @@ class TransactionList extends StatelessWidget {
                   double netExpenses = context.watch<TransactionRepositoryProvider>()
                     .getTransactionsNetExpense(_groupedTransactions[date]!);
     
+                  print("Net Expenses: $netExpenses");
+
                   return DatedExpensesPinnedHeader(
                     date: date, 
-                    label: getFormattedCurrencyAmount(netExpenses),
-                    isNetGain: netExpenses > 0,
+                    label: "${getFormattedCurrencyAmount(netExpenses * -1)}",
+                    isNetGain: netExpenses < 0,
                     dateStyle: GoogleFonts.lexend(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
@@ -206,6 +208,13 @@ class TransactionList extends StatelessWidget {
                     labelStyle: GoogleFonts.lexend(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
+                      shadows: [
+                        Shadow(
+                          color: (netExpenses > 0 ? netLossColor : netGainColor).withValues(alpha: .6),
+                          offset: Offset(1, 1),
+                          blurRadius: 2,
+                        )
+                      ],
                       color: fadedBlack
                     ),
                   );

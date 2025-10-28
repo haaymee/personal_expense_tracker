@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:expenses_tracker/interfaces/TransactionRepository.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
 import 'package:flutter/material.dart';
@@ -77,6 +79,7 @@ class TransactionRepositoryProvider extends ChangeNotifier
     double total = 0;
     for (TransactionModel x in list)
     {
+
       switch (x.transType) {
         case TransactionType.income:
           total -= x.transactionAmount;
