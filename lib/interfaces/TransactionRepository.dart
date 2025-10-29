@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 abstract class ITransactionRepository 
 {
+  Future<void> init();
+
   // Create
   Future<void> addTransaction(TransactionModel newTransaction);
 

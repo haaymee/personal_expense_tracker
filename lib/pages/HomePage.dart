@@ -4,7 +4,7 @@ import 'package:expenses_tracker/colors.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
 import 'package:expenses_tracker/pages/AddTransactionPopUp.dart';
 import 'package:expenses_tracker/repositories/LocalRepository.dart';
-import 'package:expenses_tracker/services/TransactionRepositoryService.dart';
+import 'package:expenses_tracker/providers/TransactionListProvider.dart';
 import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:expenses_tracker/widgets/Cards.dart';
 import 'package:expenses_tracker/widgets/Labels.dart';
@@ -24,30 +24,20 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  List<TransactionModel> _transactions = []; 
-
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {      
-      await context.read<TransactionRepositoryProvider>().loadTransactionsByYearAndMonth(
-        DateTime.now().year, 
-        DateTime.now().month
-      );
-
-      for (DateTime date in context.read<TransactionRepositoryProvider>().sortedTransactions.keys)
-      {
-        print(DateFormat("YYYY MM dd").format(date));
-      }
+      await context.read<TransactionListProvider>().updateTransactionLists(DateTime.now());
     });
   }
 
   @override
   Widget build(BuildContext context) 
   {
-    final transactionRepo = context.watch<TransactionRepositoryProvider>();
-    final _groupedTransactions = transactionRepo.sortedTransactions;
+    final transactionProvider = context.watch<TransactionListProvider>();
+    final _groupedTransactions = transactionProvider.currentMonthSortedTransactions;
 
     return Scaffold(
       backgroundColor: appBackgroundColor,
@@ -102,14 +92,14 @@ class _HomePageState extends State<HomePage> {
           if (_groupedTransactions.isEmpty) ...[
             const Center(child: Text("No Transactions"))
           ] else ...[
-              TransactionList(groupedTransactions: _groupedTransactions),
+              TransactionListWidget(groupedTransactions: _groupedTransactions),
           ],
 
           IgnorePointer(
             child: HeadingBalanceContainer(
               balance: 0,
-              expenses: context.watch<TransactionRepositoryProvider>().getTotalExpenses(),
-              income: context.watch<TransactionRepositoryProvider>().getTotalIncome(),
+              expenses: transactionProvider.currentMonthTotalExpenses,
+              income: transactionProvider.currentMonthTotalIncome,
             
               height: 75,
               dividerHeight: 50,
@@ -169,8 +159,8 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class TransactionList extends StatelessWidget {
-  const TransactionList({
+class TransactionListWidget extends StatelessWidget {
+  const TransactionListWidget({
     super.key,
     required Map<DateTime, List<TransactionModel>> groupedTransactions,
   }) : _groupedTransactions = groupedTransactions;
@@ -191,8 +181,8 @@ class TransactionList extends StatelessWidget {
               Builder(
                 builder: (context) {
     
-                  double netExpenses = context.watch<TransactionRepositoryProvider>()
-                    .getTransactionsNetExpense(_groupedTransactions[date]!);
+                  double netExpenses = context.watch<TransactionListProvider>()
+                    .currentMonthNetExpenses;
     
                   print("Net Expenses: $netExpenses");
 

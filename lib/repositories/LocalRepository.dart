@@ -9,6 +9,7 @@ class LocalTransactionRepository implements ITransactionRepository
   static const _tableName = "transactions";
   Database? _db;
 
+  @override
   Future<void> init() async {
     final dbPath = await getDatabasesPath();
     _db = await openDatabase(
@@ -58,6 +59,7 @@ class LocalTransactionRepository implements ITransactionRepository
 
   @override
   Future<List<TransactionModel>?> getTransactionsByYearAndMonth(DateTime dateYearMonthOnly) async{
+    dateYearMonthOnly = dateYearMonthOnly.monthYearOnly;
     final start = DateTime(dateYearMonthOnly.year, dateYearMonthOnly.month);
     final end = DateTime(dateYearMonthOnly.year, dateYearMonthOnly.month + 1, 0);
 

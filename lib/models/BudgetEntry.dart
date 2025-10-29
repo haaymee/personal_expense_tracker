@@ -118,3 +118,9 @@ class TransactionModel {
     ''');
   }
 }
+
+extension DateTimeFormatting on DateTime
+{
+  DateTime get dateOnly => DateTime(year, month, day);
+  DateTime get monthYearOnly => DateTime(year, month, 1);
+}
