@@ -62,12 +62,17 @@ class _HomePageState extends State<HomePage> {
               },
             ),
 
-            Text(
-              DateFormat("MMMM").format(context.watch<TransactionListProvider>().currentDateView),
-              style: GoogleFonts.lexend(
-                fontSize: 24,
-                fontWeight: FontWeight.bold
-              )
+            ConstrainedBox(
+              constraints: BoxConstraints(minWidth: 200),
+              child: Center(
+                child: Text(
+                  DateFormat("MMMM yyyy").format(context.watch<TransactionListProvider>().currentDateView),
+                  style: GoogleFonts.lexend(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold
+                  )
+                ),
+              ),
             ),
 
             IconButton(
