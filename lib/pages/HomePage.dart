@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:expenses_tracker/colors.dart';
 import 'package:expenses_tracker/models/BudgetEntry.dart';
 import 'package:expenses_tracker/pages/AddTransactionPopUp.dart';
-import 'package:expenses_tracker/repositories/LocalRepository.dart';
 import 'package:expenses_tracker/providers/TransactionListProvider.dart';
 import 'package:expenses_tracker/utils/StringUtils.dart';
 import 'package:expenses_tracker/widgets/Cards.dart';
@@ -11,9 +10,10 @@ import 'package:expenses_tracker/widgets/Labels.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
+import 'package:sqflite/sqlite_api.dart';
 import 'package:svg_flutter/svg_flutter.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -23,6 +23,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  TransactionListController controller = TransactionListController();
 
   @override
   void initState() {
@@ -36,9 +38,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) 
   {
-    final transactionProvider = context.watch<TransactionListProvider>();
-    final _groupedTransactions = transactionProvider.currentMonthSortedTransactions;
-
     return Scaffold(
       backgroundColor: appBackgroundColor,
       appBar: AppBar(
@@ -57,13 +56,14 @@ class _HomePageState extends State<HomePage> {
                 height: 35,  
               ),
 
-              onPressed: () {
-
+              onPressed: () async {
+                await context.read<TransactionListProvider>().updatePreviousTransactionLists();
+                controller.showPrevious();
               },
             ),
 
             Text(
-              DateFormat("MMMM").format(DateTime.now()),
+              DateFormat("MMMM").format(context.watch<TransactionListProvider>().currentDateView),
               style: GoogleFonts.lexend(
                 fontSize: 24,
                 fontWeight: FontWeight.bold
@@ -77,8 +77,9 @@ class _HomePageState extends State<HomePage> {
                 height: 35,  
               ),
 
-              onPressed: () {
-                
+              onPressed: () async {
+                await context.read<TransactionListProvider>().updateNextTransactionLists();
+                controller.showNext();
               },
             ),
           ],
@@ -89,17 +90,15 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
 
-          if (_groupedTransactions.isEmpty) ...[
-            const Center(child: Text("No Transactions"))
-          ] else ...[
-              TransactionListWidget(groupedTransactions: _groupedTransactions),
-          ],
-
+          TransactionPagesWidget(
+            controller: controller,
+          ),
+            
           IgnorePointer(
             child: HeadingBalanceContainer(
               balance: 0,
-              expenses: transactionProvider.currentMonthTotalExpenses,
-              income: transactionProvider.currentMonthTotalIncome,
+              expenses: context.watch<TransactionListProvider>().currentMonthTotalExpenses,
+              income: context.watch<TransactionListProvider>().currentMonthTotalIncome,
             
               height: 75,
               dividerHeight: 50,
@@ -159,6 +158,76 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+class TransactionPagesWidget extends StatefulWidget {
+  TransactionPagesWidget(
+    {
+      super.key,
+      required this.controller,
+    }
+  );
+
+  TransactionListController controller;
+
+  @override
+  State<TransactionPagesWidget> createState() => _TransactionPagesWidgetState();
+}
+
+class _TransactionPagesWidgetState extends State<TransactionPagesWidget> {
+  
+  int _currentIndex = 1; // 0 = previous, 1 = current, 2 = next
+  bool _isNext = true;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller._attach(_showNext, _showPrevious);
+  }
+
+  void _showNext() {
+    setState(() {
+      _isNext = true;
+      _currentIndex = (_currentIndex + 1) % 3;
+    });
+  }
+
+  void _showPrevious() {
+    setState(() {
+      _isNext = false;
+      _currentIndex = (_currentIndex - 1 + 3) % 3;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return AnimatedSwitcher(
+      duration: Duration(milliseconds: 300),
+      transitionBuilder: (child, animation) {
+        final outAnimation = Tween<Offset>(
+          begin: Offset(_isNext ? -1 : 1, 0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+
+        final inAnimation = Tween<Offset>(
+          begin: Offset(_isNext ? 1 : -1, 0),
+          end:  Offset.zero,
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+
+        return SlideTransition(
+          position: child.key == ValueKey(_currentIndex)
+              ? inAnimation // new child
+              : outAnimation, // old child
+          child: child,
+        );
+      },
+      child: TransactionListWidget(
+        groupedTransactions: context.watch<TransactionListProvider>().currentMonthSortedTransactions,
+        key: ValueKey(_currentIndex), 
+      ),
+    );
+  }
+}
+
 class TransactionListWidget extends StatelessWidget {
   const TransactionListWidget({
     super.key,
@@ -169,11 +238,12 @@ class TransactionListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return _groupedTransactions.isEmpty ? Center(child: Text("No Transactions"))
+    : Padding(
     padding: const EdgeInsets.only(top: 70),
     child: CustomScrollView(
       slivers: [
-        for (final date in _groupedTransactions!.keys) ...[
+        for (final date in _groupedTransactions.keys) ...[
     
           MultiSliver(
             pushPinnedChildren: true,
@@ -184,11 +254,9 @@ class TransactionListWidget extends StatelessWidget {
                   double netExpenses = context.watch<TransactionListProvider>()
                     .currentMonthNetExpenses;
     
-                  print("Net Expenses: $netExpenses");
-
                   return DatedExpensesPinnedHeader(
                     date: date, 
-                    label: "${getFormattedCurrencyAmount(netExpenses * -1)}",
+                    label: getFormattedCurrencyAmount(netExpenses * -1),
                     isNetGain: netExpenses < 0,
                     dateStyle: GoogleFonts.lexend(
                       fontWeight: FontWeight.bold,
@@ -239,7 +307,7 @@ class TransactionListWidget extends StatelessWidget {
         ]
       ],
     ),
-                );
+  );
   }
 }
 
@@ -573,4 +641,18 @@ Future<void> showBlurredFormDialog(BuildContext context) async {
       );
     },
   );
+}
+
+
+class TransactionListController {
+  void Function()? _next;
+  void Function()? _previous;
+
+  void _attach(void Function() next, void Function() previous) {
+    _next = next;
+    _previous = previous;
+  }
+
+  void showNext() => _next?.call();
+  void showPrevious() => _previous?.call();
 }
