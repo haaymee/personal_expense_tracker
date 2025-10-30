@@ -179,8 +179,8 @@ class TransactionPagesWidget extends StatefulWidget {
 
 class _TransactionPagesWidgetState extends State<TransactionPagesWidget> {
   
-  int _currentIndex = 1; // 0 = previous, 1 = current, 2 = next
   bool _isNext = true;
+  DateTime _currentCachedMonthView = DateTime.now().monthYearOnly;
 
   @override
   void initState() {
@@ -191,19 +191,20 @@ class _TransactionPagesWidgetState extends State<TransactionPagesWidget> {
   void _showNext() {
     setState(() {
       _isNext = true;
-      _currentIndex = (_currentIndex + 1) % 3;
     });
   }
 
   void _showPrevious() {
     setState(() {
       _isNext = false;
-      _currentIndex = (_currentIndex - 1 + 3) % 3;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+
+    final currentMonthView = context.watch<TransactionListProvider>().currentDateView.monthYearOnly;
+    _currentCachedMonthView = currentMonthView;
 
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 300),
@@ -211,15 +212,15 @@ class _TransactionPagesWidgetState extends State<TransactionPagesWidget> {
         final outAnimation = Tween<Offset>(
           begin: Offset(_isNext ? -1 : 1, 0),
           end: Offset.zero,
-        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic));
 
         final inAnimation = Tween<Offset>(
           begin: Offset(_isNext ? 1 : -1, 0),
           end:  Offset.zero,
-        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic));
 
         return SlideTransition(
-          position: child.key == ValueKey(_currentIndex)
+          position: child.key == ValueKey(_currentCachedMonthView)
               ? inAnimation // new child
               : outAnimation, // old child
           child: child,
@@ -227,7 +228,7 @@ class _TransactionPagesWidgetState extends State<TransactionPagesWidget> {
       },
       child: TransactionListWidget(
         groupedTransactions: context.watch<TransactionListProvider>().currentMonthSortedTransactions,
-        key: ValueKey(_currentIndex), 
+        key: ValueKey(currentMonthView), 
       ),
     );
   }
